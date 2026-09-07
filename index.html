@@ -465,6 +465,25 @@
 
         let myUid = null;
         let cloudData = {};
+        
+        // ================= ระบบรักษาความปลอดภัย: เตะออกเมื่อไม่ใช้งาน =================
+        let inactivityTimer;
+        const IDLE_TIMEOUT = 15 * 60 * 1000; // 15 นาที (หน่วยเป็นมิลลิวินาที)
+
+        function resetTimer() {
+            if (!myUid) return; // ทำงานเฉพาะตอนที่ล็อกอินแล้วเท่านั้น
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                alert("🔒 ระบบได้ทำการออกจากระบบอัตโนมัติ เนื่องจากไม่มีการใช้งานเกิน 15 นาที เพื่อความปลอดภัยของข้อมูลครับ");
+                window.handleLogout();
+            }, IDLE_TIMEOUT);
+        }
+
+        // ดักจับการเคลื่อนไหวเพื่อต่อเวลา
+        ['mousemove', 'mousedown', 'keypress', 'touchmove', 'scroll'].forEach(event => {
+            document.addEventListener(event, resetTimer, true);
+        });
+        // =========================================================================
 
         const today = new Date();
         document.getElementById('global-month').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
@@ -476,7 +495,9 @@
                 .then(() => { document.getElementById('login-error').style.display = 'none'; })
                 .catch(error => { document.getElementById('login-error').style.display = 'block'; });
         };
-        window.handleLogout = () => { signOut(auth).then(() => { location.reload(); }); };
+        window.handleLogout = () => { 
+            signOut(auth).then(() => { location.reload(); }); 
+        };
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -487,6 +508,10 @@
                     cloudData = snapshot.val() || {};
                     window.refreshAllUI();
                 });
+                resetTimer(); // เริ่มจับเวลาครั้งแรกเมื่อล็อกอินเข้าเว็บสำเร็จ
+            } else {
+                myUid = null;
+                clearTimeout(inactivityTimer); // ปิดการจับเวลาเมื่อล็อกเอาต์
             }
         });
 
