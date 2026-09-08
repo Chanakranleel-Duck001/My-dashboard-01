@@ -141,7 +141,6 @@
                         <h3 style="display:block; text-align: center; color: #004085; margin-bottom: 20px;">📊 สรุปข้อมูลเฉลี่ยประจำเดือน</h3>
                         
                         <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 20px; text-align: center; gap: 10px;">
-                            <!-- กล่องน้ำ -->
                             <div style="flex: 1; min-width: 140px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                                 <p style="font-size: 0.95em; font-weight: bold; margin: 0 0 5px 0; color:#0056b3;">
                                     💦 เฉลี่ยปริมาณน้ำ 
@@ -152,7 +151,6 @@
                                 <div style="font-size: 1.8em; color: #0056b3; font-weight: bold;"><span id="avg-wa-val-home">0</span> <span style="font-size:0.4em; color:#666;">L/วัน</span></div>
                             </div>
                             
-                            <!-- กล่องน้ำฝน -->
                             <div style="flex: 1; min-width: 140px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                                 <p style="font-size: 0.95em; font-weight: bold; margin: 0 0 5px 0; color:#17a2b8;">🌧️ น้ำฝนรวมประจำเดือน</p>
                                 <div style="font-size: 1.8em; color: #17a2b8; font-weight: bold;"><span id="sum-rf-val-home">0</span> <span style="font-size:0.4em; color:#666;">mm</span></div>
@@ -165,7 +163,6 @@
                         <h4 style="margin: 15px 0 5px 0; color: #555;">🌡️ อุณหภูมิดิน (เฉลี่ยทุกๆ ชม.)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-avg-st-home"></canvas></div>
                         
-                        <!-- กราฟแท่งรายปี -->
                         <h4 style="margin: 15px 0 5px 0; color: #17a2b8;">🌧️ ปริมาณน้ำฝนสะสมรายเดือน (ตลอดปี)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-yearly-rf-home"></canvas></div>
 
@@ -194,7 +191,6 @@
                         <h3 style="display:block; text-align: center; color: #155724; margin-bottom: 20px;">📊 สรุปข้อมูลเฉลี่ยประจำเดือน</h3>
                         
                         <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 20px; text-align: center; gap: 10px;">
-                            <!-- กล่องน้ำ -->
                             <div style="flex: 1; min-width: 140px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                                 <p style="font-size: 0.95em; font-weight: bold; margin: 0 0 5px 0; color:#28a745;">
                                     💦 เฉลี่ยปริมาณน้ำ 
@@ -205,7 +201,6 @@
                                 <div style="font-size: 1.8em; color: #28a745; font-weight: bold;"><span id="avg-wa-val-garden">0</span> <span style="font-size:0.4em; color:#666;">L/วัน</span></div>
                             </div>
                             
-                            <!-- กล่องน้ำฝน -->
                             <div style="flex: 1; min-width: 140px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                                 <p style="font-size: 0.95em; font-weight: bold; margin: 0 0 5px 0; color:#17a2b8;">🌧️ น้ำฝนรวมประจำเดือน</p>
                                 <div style="font-size: 1.8em; color: #17a2b8; font-weight: bold;"><span id="sum-rf-val-garden">0</span> <span style="font-size:0.4em; color:#666;">mm</span></div>
@@ -218,7 +213,6 @@
                         <h4 style="margin: 15px 0 5px 0; color: #555;">🌡️ อุณหภูมิดิน (เฉลี่ยทุกๆ ชม.)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-avg-st-garden"></canvas></div>
                         
-                        <!-- กราฟแท่งรายปี -->
                         <h4 style="margin: 15px 0 5px 0; color: #17a2b8;">🌧️ ปริมาณน้ำฝนสะสมรายเดือน (ตลอดปี)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-yearly-rf-garden"></canvas></div>
 
@@ -374,7 +368,7 @@
                         <h4>ℹ️ ข้อมูลพื้นฐานต้นไม้</h4>
                         <div class="input-grid">
                             <input type="text" id="t-name-home" placeholder="ชื่อต้นไม้/พันธุ์พืช (จำเป็น)">
-                            <input type="date" id="t-date-home" title="วันที่บันทึก">
+                            <input type="date" id="t-date-home" title="วันที่บันทึก/ปลูก">
                             <select id="t-status-home">
                                 <option value="ดีเยี่ยม">🟢 เติบโตดีเยี่ยม</option><option value="ปกติ" selected>🟡 ปกติทั่วไป</option>
                                 <option value="ออกดอก">⚪ กำลังออกดอก/ผล</option><option value="ต้องดูแล">🔴 ป่วย / ต้องดูแลพิเศษ</option>
@@ -385,6 +379,7 @@
                     <div class="form-section" style="background: #fff8e1; border-color: #ffeeba;">
                         <h4>🧪 การบำรุงดินและปุ๋ย</h4>
                         <div class="input-grid">
+                            <input type="date" id="t-fert-date-home" title="วันที่ใส่ปุ๋ย/บำรุงดินล่าสุด">
                             <input type="text" id="t-soil-home" placeholder="ชนิดดิน (เช่น ดินร่วน, ดินถุง)">
                             <input type="text" id="t-fert-home" placeholder="ชนิดปุ๋ย (เช่น มูลวัว, สูตร 15-15-15)">
                             <input type="text" id="t-amount-home" placeholder="ปริมาณที่ใส่ (เช่น 1 กก., 2 กำมือ)">
@@ -408,7 +403,7 @@
                         <h4>ℹ️ ข้อมูลพื้นฐานต้นไม้</h4>
                         <div class="input-grid">
                             <input type="text" id="t-name-garden" placeholder="ชื่อต้นไม้/พันธุ์พืช (จำเป็น)">
-                            <input type="date" id="t-date-garden" title="วันที่บันทึก">
+                            <input type="date" id="t-date-garden" title="วันที่บันทึก/ปลูก">
                             <select id="t-status-garden">
                                 <option value="ดีเยี่ยม">🟢 เติบโตดีเยี่ยม</option><option value="ปกติ" selected>🟡 ปกติทั่วไป</option>
                                 <option value="ออกดอก">⚪ กำลังออกดอก/ผล</option><option value="ต้องดูแล">🔴 ป่วย / ต้องดูแลพิเศษ</option>
@@ -419,6 +414,7 @@
                     <div class="form-section" style="background: #fff8e1; border-color: #ffeeba;">
                         <h4>🧪 การบำรุงดินและปุ๋ย</h4>
                         <div class="input-grid">
+                            <input type="date" id="t-fert-date-garden" title="วันที่ใส่ปุ๋ย/บำรุงดินล่าสุด">
                             <input type="text" id="t-soil-garden" placeholder="ชนิดดิน">
                             <input type="text" id="t-fert-garden" placeholder="ชนิดปุ๋ย">
                             <input type="text" id="t-amount-garden" placeholder="ปริมาณที่ใส่">
@@ -465,25 +461,29 @@
 
         let myUid = null;
         let cloudData = {};
-        
-        // ================= ระบบรักษาความปลอดภัย: เตะออกเมื่อไม่ใช้งาน =================
+
+        // ================= ระบบรักษาความปลอดภัย: เตะออกเมื่อไม่ใช้งาน หรือ ปิดเว็บนานเกิน 15 นาที =================
         let inactivityTimer;
-        const IDLE_TIMEOUT = 15 * 60 * 1000; // 15 นาที (หน่วยเป็นมิลลิวินาที)
+        const IDLE_TIMEOUT = 15 * 60 * 1000; // 15 นาที
 
         function resetTimer() {
-            if (!myUid) return; // ทำงานเฉพาะตอนที่ล็อกอินแล้วเท่านั้น
+            if (!myUid) return;
+            
+            // แสตมป์เวลาล่าสุดที่ใช้งานลงในเครื่อง (ใช้เช็คตอนเปิดเว็บใหม่)
+            localStorage.setItem('smartFarm_lastActive', Date.now().toString());
+
             clearTimeout(inactivityTimer);
             inactivityTimer = setTimeout(() => {
-                alert("🔒 ระบบได้ทำการออกจากระบบอัตโนมัติ เนื่องจากไม่มีการใช้งานเกิน 15 นาที เพื่อความปลอดภัยของข้อมูลครับ");
+                alert("🔒 ระบบได้ทำการออกจากระบบอัตโนมัติ เนื่องจากไม่มีการใช้งานบนหน้าเว็บเกิน 15 นาทีครับ");
                 window.handleLogout();
             }, IDLE_TIMEOUT);
         }
 
-        // ดักจับการเคลื่อนไหวเพื่อต่อเวลา
-        ['mousemove', 'mousedown', 'keypress', 'touchmove', 'scroll'].forEach(event => {
+        // ดักจับการเคลื่อนไหวเพื่อต่อเวลาให้ถ้ากำลังใช้งานอยู่
+        ['mousemove', 'mousedown', 'keypress', 'touchmove', 'scroll', 'click'].forEach(event => {
             document.addEventListener(event, resetTimer, true);
         });
-        // =========================================================================
+        // =========================================================================================
 
         const today = new Date();
         document.getElementById('global-month').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
@@ -501,6 +501,17 @@
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                // ระบบเช็คความปลอดภัยตอนเปิดเว็บ: ถ้าเคยปิดเว็บไปนานกว่า 15 นาที ให้เตะออก
+                const lastActive = localStorage.getItem('smartFarm_lastActive');
+                if (lastActive && (Date.now() - parseInt(lastActive) > IDLE_TIMEOUT)) {
+                    localStorage.removeItem('smartFarm_lastActive'); // ล้างแสตมป์
+                    signOut(auth).then(() => {
+                        alert("🔒 เซสชันหมดอายุ: คุณไม่ได้เปิดหน้าเว็บฟาร์มนานเกิน 15 นาที กรุณาล็อกอินใหม่เพื่อความปลอดภัยครับ");
+                        location.reload();
+                    });
+                    return; // หยุดการทำงานส่วนอื่น
+                }
+
                 myUid = user.uid;
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
@@ -511,7 +522,8 @@
                 resetTimer(); // เริ่มจับเวลาครั้งแรกเมื่อล็อกอินเข้าเว็บสำเร็จ
             } else {
                 myUid = null;
-                clearTimeout(inactivityTimer); // ปิดการจับเวลาเมื่อล็อกเอาต์
+                clearTimeout(inactivityTimer); 
+                localStorage.removeItem('smartFarm_lastActive'); // ล้างข้อมูลเมื่อล็อกเอาต์
             }
         });
 
@@ -661,9 +673,10 @@
 
             trees.forEach((tree, originalIdx) => {
                 const formattedDate = tree.date ? new Date(tree.date).toLocaleDateString('th-TH') : 'ไม่ระบุ';
+                const formattedFertDate = tree.fertDate ? new Date(tree.fertDate).toLocaleDateString('th-TH') : '';
                 
                 if(searchQuery) {
-                    const targetStr = `${tree.name} ${formattedDate} ${tree.status} ${tree.note || ''} ${tree.soil || ''} ${tree.fert || ''}`.toLowerCase();
+                    const targetStr = `${tree.name} ${formattedDate} ${formattedFertDate} ${tree.status} ${tree.note || ''} ${tree.soil || ''} ${tree.fert || ''}`.toLowerCase();
                     if(!targetStr.includes(searchQuery)) return; 
                 }
 
@@ -671,9 +684,10 @@
                 if(loc === 'garden') card.style.borderLeftColor = '#0056b3';
                 
                 let extraInfo = '';
-                if(tree.soil || tree.fert || tree.amount || tree.qty) {
+                if(tree.soil || tree.fert || tree.amount || tree.qty || tree.fertDate) {
                     extraInfo += `<div style="background: #fdfbf7; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 0.9em; border: 1px dashed #d1c4a5;">`;
                     extraInfo += `<div style="margin-bottom: 8px; font-weight: bold; color: #856404;">🧪 บันทึกการบำรุง:</div>`;
+                    if(tree.fertDate) extraInfo += `<div style="margin-bottom:4px; color:#28a745;">📅 <strong>วันที่บำรุงล่าสุด:</strong> ${formattedFertDate}</div>`;
                     if(tree.soil) extraInfo += `<div style="margin-bottom:4px;">🪨 <strong>ชนิดดิน:</strong> ${tree.soil}</div>`;
                     if(tree.fert) extraInfo += `<div style="margin-bottom:4px;">🧪 <strong>ชนิดปุ๋ย:</strong> ${tree.fert}</div>`;
                     if(tree.amount) extraInfo += `<div style="margin-bottom:4px;">⚖️ <strong>ปริมาณ:</strong> ${tree.amount}</div>`;
@@ -683,7 +697,7 @@
                 card.innerHTML = `
                     <button class="delete-tree-btn" onclick="window.deleteIndividualTree('${loc}', ${originalIdx})" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.2em; color: red; cursor: pointer;">🗑️</button>
                     <h4>${tree.name}</h4>
-                    <p>🕒 <strong>วันที่บันทึก:</strong> ${formattedDate}</p>
+                    <p>🕒 <strong>วันที่บันทึก/ปลูก:</strong> ${formattedDate}</p>
                     <p>📊 <strong>สถานะ:</strong> <span class="status-badge status-${tree.status}">${tree.status}</span></p>
                     <p>📝 <strong>หมายเหตุ:</strong> ${tree.note || '-'}</p>
                     ${extraInfo}
@@ -693,13 +707,27 @@
         };
 
         window.addIndividualTree = (loc) => {
-            const name = document.getElementById(`t-name-${loc}`).value; const date = document.getElementById(`t-date-${loc}`).value;
-            const status = document.getElementById(`t-status-${loc}`).value; const soil = document.getElementById(`t-soil-${loc}`).value;
-            const fert = document.getElementById(`t-fert-${loc}`).value; const amount = document.getElementById(`t-amount-${loc}`).value;
-            const qty = document.getElementById(`t-qty-${loc}`).value; const note = document.getElementById(`t-note-${loc}`).value;
+            const name = document.getElementById(`t-name-${loc}`).value; 
+            const date = document.getElementById(`t-date-${loc}`).value;
+            const status = document.getElementById(`t-status-${loc}`).value; 
+            
+            const fertDate = document.getElementById(`t-fert-date-${loc}`).value;
+            const soil = document.getElementById(`t-soil-${loc}`).value;
+            const fert = document.getElementById(`t-fert-${loc}`).value; 
+            const amount = document.getElementById(`t-amount-${loc}`).value;
+            const qty = document.getElementById(`t-qty-${loc}`).value; 
+            
+            const note = document.getElementById(`t-note-${loc}`).value;
+            
             if(!name.trim()) return;
-            const trees = getStorage(`individual_trees_${loc}`, true); trees.push({name, date, status, soil, fert, amount, qty, note}); saveStorage(`individual_trees_${loc}`, trees);
-            document.getElementById(`t-name-${loc}`).value = ''; document.getElementById(`t-date-${loc}`).value = '';
+            const trees = getStorage(`individual_trees_${loc}`, true); 
+            trees.push({name, date, status, fertDate, soil, fert, amount, qty, note}); 
+            saveStorage(`individual_trees_${loc}`, trees);
+            
+            // ล้างข้อมูลในกล่องหลังจากบันทึกเสร็จ
+            document.getElementById(`t-name-${loc}`).value = ''; 
+            document.getElementById(`t-date-${loc}`).value = '';
+            document.getElementById(`t-fert-date-${loc}`).value = '';
         };
         window.deleteIndividualTree = (loc, idx) => { if(confirm("คุณต้องการลบข้อมูลต้นไม้นี้ใช่หรือไม่?")) { const trees = getStorage(`individual_trees_${loc}`, true); trees.splice(idx, 1); saveStorage(`individual_trees_${loc}`, trees); } };
 
