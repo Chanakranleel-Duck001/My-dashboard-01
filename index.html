@@ -134,12 +134,10 @@
         <!-- หน้าที่ 1 : Management & Averages -->
         <div id="page1" class="page-content active">
             <div class="management-container">
-                <!-- ฝั่งบ้าน -->
                 <div class="split-screen">
                     <h1>บ้าน</h1>
                     <div class="card" style="background: #f0f8ff; border-color: #cce5ff;">
                         <h3 style="display:block; text-align: center; color: #004085; margin-bottom: 20px;">📊 สรุปข้อมูลเฉลี่ยประจำเดือน</h3>
-                        
                         <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 20px; text-align: center; gap: 10px;">
                             <div style="flex: 1; min-width: 140px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                                 <p style="font-size: 0.95em; font-weight: bold; margin: 0 0 5px 0; color:#0056b3;">
@@ -150,26 +148,20 @@
                                 </p>
                                 <div style="font-size: 1.8em; color: #0056b3; font-weight: bold;"><span id="avg-wa-val-home">0</span> <span style="font-size:0.4em; color:#666;">L/วัน</span></div>
                             </div>
-                            
                             <div style="flex: 1; min-width: 140px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                                 <p style="font-size: 0.95em; font-weight: bold; margin: 0 0 5px 0; color:#17a2b8;">🌧️ น้ำฝนรวมประจำเดือน</p>
                                 <div style="font-size: 1.8em; color: #17a2b8; font-weight: bold;"><span id="sum-rf-val-home">0</span> <span style="font-size:0.4em; color:#666;">mm</span></div>
                             </div>
                         </div>
-
                         <h4 style="margin: 0 0 5px 0; color: #555;">💧 ความชื้นดิน (เฉลี่ยทุกๆ ชม.)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-avg-sm-home"></canvas></div>
-
                         <h4 style="margin: 15px 0 5px 0; color: #555;">🌡️ อุณหภูมิดิน (เฉลี่ยทุกๆ ชม.)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-avg-st-home"></canvas></div>
-                        
                         <h4 style="margin: 15px 0 5px 0; color: #17a2b8;">🌧️ ปริมาณน้ำฝนสะสมรายเดือน (ตลอดปี)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-yearly-rf-home"></canvas></div>
-
                         <h4 style="margin: 15px 0 5px 0; color: #0056b3;">💦 ปริมาณน้ำใช้สะสมรายเดือน (ตลอดปี)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-yearly-wa-home"></canvas></div>
                     </div>
-
                     <div class="card">
                         <div class="card-header">
                             <h3 style="display:block;">รายการที่ต้องทำ</h3>
@@ -184,12 +176,10 @@
                     </div>
                 </div>
 
-                <!-- ฝั่งบ้านสวน -->
                 <div class="split-screen">
                     <h1>บ้านสวน</h1>
                     <div class="card" style="background: #f4fcf5; border-color: #c3e6cb;">
                         <h3 style="display:block; text-align: center; color: #155724; margin-bottom: 20px;">📊 สรุปข้อมูลเฉลี่ยประจำเดือน</h3>
-                        
                         <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 20px; text-align: center; gap: 10px;">
                             <div style="flex: 1; min-width: 140px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                                 <p style="font-size: 0.95em; font-weight: bold; margin: 0 0 5px 0; color:#28a745;">
@@ -200,26 +190,20 @@
                                 </p>
                                 <div style="font-size: 1.8em; color: #28a745; font-weight: bold;"><span id="avg-wa-val-garden">0</span> <span style="font-size:0.4em; color:#666;">L/วัน</span></div>
                             </div>
-                            
                             <div style="flex: 1; min-width: 140px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                                 <p style="font-size: 0.95em; font-weight: bold; margin: 0 0 5px 0; color:#17a2b8;">🌧️ น้ำฝนรวมประจำเดือน</p>
                                 <div style="font-size: 1.8em; color: #17a2b8; font-weight: bold;"><span id="sum-rf-val-garden">0</span> <span style="font-size:0.4em; color:#666;">mm</span></div>
                             </div>
                         </div>
-
                         <h4 style="margin: 0 0 5px 0; color: #555;">💧 ความชื้นดิน (เฉลี่ยทุกๆ ชม.)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-avg-sm-garden"></canvas></div>
-
                         <h4 style="margin: 15px 0 5px 0; color: #555;">🌡️ อุณหภูมิดิน (เฉลี่ยทุกๆ ชม.)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-avg-st-garden"></canvas></div>
-                        
                         <h4 style="margin: 15px 0 5px 0; color: #17a2b8;">🌧️ ปริมาณน้ำฝนสะสมรายเดือน (ตลอดปี)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-yearly-rf-garden"></canvas></div>
-
                         <h4 style="margin: 15px 0 5px 0; color: #28a745;">💦 ปริมาณน้ำใช้สะสมรายเดือน (ตลอดปี)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-yearly-wa-garden"></canvas></div>
                     </div>
-
                     <div class="card">
                         <div class="card-header">
                             <h3 style="display:block;">รายการที่ต้องทำ</h3>
@@ -254,17 +238,7 @@
                             </select>
                             <input type="file" multiple accept=".xlsx, .xls" onchange="window.handleMultipleFileUpload(event, 'home')">
                         </div>
-                        <div style="background: #fdfbf7; padding: 10px; border-radius: 8px; border: 1px dashed #d1c4a5; font-size: 0.85em; margin-top: 10px;">
-                            <strong>⚠️ หากคุณกำลังอัปโหลด "ข้อมูลปริมาณน้ำ"</strong><br>
-                            กรุณาระบุว่าไฟล์นี้เป็นของ: 
-                            <select id="upload-water-zone-home" style="padding: 2px; border-radius: 4px; margin-top: 5px;">
-                                <option value="1">จุดที่ 1</option>
-                                <option value="2">จุดที่ 2</option>
-                                <option value="3">จุดที่ 3</option>
-                            </select>
-                        </div>
                     </div>
-                    
                     <div class="card" id="card-wa-home">
                         <h3>
                             <span>🪣 ปริมาณน้ำ (L) 
@@ -272,14 +246,10 @@
                                     <option value="1">จุดที่ 1</option><option value="2">จุดที่ 2</option><option value="3">จุดที่ 3</option>
                                 </select>
                             </span>
-                            <div class="action-btns">
-                                <button class="fullscreen-btn" onclick="window.openFullscreen('wa-home', 'น้ำสะสม (บ้าน)')">🔍 ขยาย</button>
-                                <button class="clear-chart-btn" onclick="window.clearData('water_acc', 'home')">🗑️ ล้างโซนนี้</button>
-                            </div>
+                            <div class="action-btns"><button class="fullscreen-btn" onclick="window.openFullscreen('wa-home', 'น้ำสะสม (บ้าน)')">🔍 ขยาย</button><button class="clear-chart-btn" onclick="window.clearData('water_acc', 'home')">🗑️ ล้างโซนนี้</button></div>
                         </h3>
                         <div class="chart-container" id="container-wa-home"><canvas id="chart-wa-home"></canvas></div>
                     </div>
-
                     <div class="card" id="card-rf-home">
                         <h3><span>🌧️ ปริมาณน้ำฝน (mm)</span><div class="action-btns"><button class="fullscreen-btn" onclick="window.openFullscreen('rf-home', 'ปริมาณน้ำฝน')">🔍 ขยาย</button><button class="clear-chart-btn" onclick="window.clearData('rainfall', 'home')">🗑️ ล้าง</button></div></h3>
                         <div class="chart-container" id="container-rf-home"><canvas id="chart-rf-home"></canvas></div>
@@ -313,17 +283,7 @@
                             </select>
                             <input type="file" multiple accept=".xlsx, .xls" onchange="window.handleMultipleFileUpload(event, 'garden')">
                         </div>
-                        <div style="background: #fdfbf7; padding: 10px; border-radius: 8px; border: 1px dashed #d1c4a5; font-size: 0.85em; margin-top: 10px;">
-                            <strong>⚠️ หากคุณกำลังอัปโหลด "ข้อมูลปริมาณน้ำ"</strong><br>
-                            กรุณาระบุว่าไฟล์นี้เป็นของ: 
-                            <select id="upload-water-zone-garden" style="padding: 2px; border-radius: 4px; margin-top: 5px;">
-                                <option value="1">จุดที่ 1</option>
-                                <option value="2">จุดที่ 2</option>
-                                <option value="3">จุดที่ 3</option>
-                            </select>
-                        </div>
                     </div>
-
                     <div class="card" id="card-wa-garden">
                         <h3>
                             <span>🪣 ปริมาณน้ำ (L) 
@@ -331,14 +291,10 @@
                                     <option value="1">จุดที่ 1</option><option value="2">จุดที่ 2</option><option value="3">จุดที่ 3</option>
                                 </select>
                             </span>
-                            <div class="action-btns">
-                                <button class="fullscreen-btn" onclick="window.openFullscreen('wa-garden', 'น้ำสะสม (บ้านสวน)')">🔍 ขยาย</button>
-                                <button class="clear-chart-btn" onclick="window.clearData('water_acc', 'garden')">🗑️ ล้างโซนนี้</button>
-                            </div>
+                            <div class="action-btns"><button class="fullscreen-btn" onclick="window.openFullscreen('wa-garden', 'น้ำสะสม (บ้านสวน)')">🔍 ขยาย</button><button class="clear-chart-btn" onclick="window.clearData('water_acc', 'garden')">🗑️ ล้างโซนนี้</button></div>
                         </h3>
                         <div class="chart-container" id="container-wa-garden"><canvas id="chart-wa-garden"></canvas></div>
                     </div>
-
                     <div class="card" id="card-rf-garden">
                         <h3><span>🌧️ ปริมาณน้ำฝน (mm)</span><div class="action-btns"><button class="fullscreen-btn" onclick="window.openFullscreen('rf-garden', 'ปริมาณน้ำฝน')">🔍 ขยาย</button><button class="clear-chart-btn" onclick="window.clearData('rainfall', 'garden')">🗑️ ล้าง</button></div></h3>
                         <div class="chart-container" id="container-rf-garden"><canvas id="chart-rf-garden"></canvas></div>
@@ -362,24 +318,24 @@
         <!-- หน้าที่ 3 : ต้นไม้บ้าน -->
         <div id="page3" class="page-content">
             <div class="tree-page-container">
-                <h1 style="color: #1a1a1a; margin-bottom: 20px;">🌳 บันทึกการดูแลต้นไม้ (บ้าน)</h1>
+                <h1 style="color: #1a1a1a; margin-bottom: 20px;">🌳 บันทึกข้อมูล (บ้าน)</h1>
                 <div class="tree-form-container">
                     <div class="form-section">
                         <h4>ℹ️ ข้อมูลพื้นฐานต้นไม้</h4>
                         <div class="input-grid">
-                            <input type="text" id="t-name-home" placeholder="ชื่อต้นไม้/พันธุ์พืช (จำเป็น)">
+                            <input type="text" id="t-name-home" placeholder="ชื่อต้นไม้ (เว้นว่างได้ ถ้าจะบันทึกแค่ปุ๋ย)">
                             <input type="date" id="t-date-home" title="วันที่บันทึก/ปลูก">
                             <select id="t-status-home">
                                 <option value="ดีเยี่ยม">🟢 เติบโตดีเยี่ยม</option><option value="ปกติ" selected>🟡 ปกติทั่วไป</option>
                                 <option value="ออกดอก">⚪ กำลังออกดอก/ผล</option><option value="ต้องดูแล">🔴 ป่วย / ต้องดูแลพิเศษ</option>
                             </select>
-                            <input type="text" id="t-note-home" placeholder="หมายเหตุทั่วไป (เช่น รดน้ำทุกวัน)">
+                            <input type="text" id="t-note-home" placeholder="หมายเหตุทั่วไป">
                         </div>
                     </div>
                     <div class="form-section" style="background: #fff8e1; border-color: #ffeeba;">
-                        <h4>🧪 การบำรุงดินและปุ๋ย</h4>
+                        <h4>🧪 การบำรุงดินและปุ๋ย (บันทึกแยกได้)</h4>
                         <div class="input-grid">
-                            <input type="date" id="t-fert-date-home" title="วันที่ใส่ปุ๋ย/บำรุงดินล่าสุด">
+                            <input type="date" id="t-fert-date-home" title="วันที่ใส่ปุ๋ย/บำรุงดิน">
                             <input type="text" id="t-soil-home" placeholder="ชนิดดิน (เช่น ดินร่วน, ดินถุง)">
                             <input type="text" id="t-fert-home" placeholder="ชนิดปุ๋ย (เช่น มูลวัว, สูตร 15-15-15)">
                             <input type="text" id="t-amount-home" placeholder="ปริมาณที่ใส่ (เช่น 1 กก., 2 กำมือ)">
@@ -388,8 +344,7 @@
                     </div>
                     <button class="full-width-btn" onclick="window.addIndividualTree('home')">➕ บันทึกข้อมูลขึ้น Cloud</button>
                 </div>
-                
-                <input type="text" id="search-tree-home" class="search-box" placeholder="🔍 ค้นหาชื่อต้นไม้, วันที่ (เช่น 15/09/2026), หรือสถานะ..." onkeyup="window.renderIndividualTrees('home')">
+                <input type="text" id="search-tree-home" class="search-box" placeholder="🔍 ค้นหาชื่อต้นไม้, วันที่, ชนิดปุ๋ย..." onkeyup="window.renderIndividualTrees('home')">
                 <div id="tree-grid-home" class="tree-grid"></div>
             </div>
         </div>
@@ -397,12 +352,12 @@
         <!-- หน้าที่ 4 : ต้นไม้บ้านสวน -->
         <div id="page4" class="page-content">
             <div class="tree-page-container">
-                <h1 style="color: #1a1a1a; margin-bottom: 20px;">🌲 บันทึกการดูแลต้นไม้ (บ้านสวน)</h1>
+                <h1 style="color: #1a1a1a; margin-bottom: 20px;">🌲 บันทึกข้อมูล (บ้านสวน)</h1>
                 <div class="tree-form-container">
                     <div class="form-section">
                         <h4>ℹ️ ข้อมูลพื้นฐานต้นไม้</h4>
                         <div class="input-grid">
-                            <input type="text" id="t-name-garden" placeholder="ชื่อต้นไม้/พันธุ์พืช (จำเป็น)">
+                            <input type="text" id="t-name-garden" placeholder="ชื่อต้นไม้ (เว้นว่างได้ ถ้าจะบันทึกแค่ปุ๋ย)">
                             <input type="date" id="t-date-garden" title="วันที่บันทึก/ปลูก">
                             <select id="t-status-garden">
                                 <option value="ดีเยี่ยม">🟢 เติบโตดีเยี่ยม</option><option value="ปกติ" selected>🟡 ปกติทั่วไป</option>
@@ -412,9 +367,9 @@
                         </div>
                     </div>
                     <div class="form-section" style="background: #fff8e1; border-color: #ffeeba;">
-                        <h4>🧪 การบำรุงดินและปุ๋ย</h4>
+                        <h4>🧪 การบำรุงดินและปุ๋ย (บันทึกแยกได้)</h4>
                         <div class="input-grid">
-                            <input type="date" id="t-fert-date-garden" title="วันที่ใส่ปุ๋ย/บำรุงดินล่าสุด">
+                            <input type="date" id="t-fert-date-garden" title="วันที่ใส่ปุ๋ย/บำรุงดิน">
                             <input type="text" id="t-soil-garden" placeholder="ชนิดดิน">
                             <input type="text" id="t-fert-garden" placeholder="ชนิดปุ๋ย">
                             <input type="text" id="t-amount-garden" placeholder="ปริมาณที่ใส่">
@@ -423,8 +378,7 @@
                     </div>
                     <button class="full-width-btn" onclick="window.addIndividualTree('garden')">➕ บันทึกข้อมูลขึ้น Cloud</button>
                 </div>
-                
-                <input type="text" id="search-tree-garden" class="search-box" placeholder="🔍 ค้นหาชื่อต้นไม้, วันที่ (เช่น 15/09/2026), หรือชนิดปุ๋ย..." onkeyup="window.renderIndividualTrees('garden')">
+                <input type="text" id="search-tree-garden" class="search-box" placeholder="🔍 ค้นหาชื่อต้นไม้, วันที่, ชนิดปุ๋ย..." onkeyup="window.renderIndividualTrees('garden')">
                 <div id="tree-grid-garden" class="tree-grid"></div>
             </div>
         </div>
@@ -461,17 +415,13 @@
 
         let myUid = null;
         let cloudData = {};
-
-        // ================= ระบบรักษาความปลอดภัย: เตะออกเมื่อไม่ใช้งาน หรือ ปิดเว็บนานเกิน 15 นาที =================
+        
         let inactivityTimer;
-        const IDLE_TIMEOUT = 15 * 60 * 1000; // 15 นาที
+        const IDLE_TIMEOUT = 15 * 60 * 1000; 
 
         function resetTimer() {
             if (!myUid) return;
-            
-            // แสตมป์เวลาล่าสุดที่ใช้งานลงในเครื่อง (ใช้เช็คตอนเปิดเว็บใหม่)
             localStorage.setItem('smartFarm_lastActive', Date.now().toString());
-
             clearTimeout(inactivityTimer);
             inactivityTimer = setTimeout(() => {
                 alert("🔒 ระบบได้ทำการออกจากระบบอัตโนมัติ เนื่องจากไม่มีการใช้งานบนหน้าเว็บเกิน 15 นาทีครับ");
@@ -479,11 +429,9 @@
             }, IDLE_TIMEOUT);
         }
 
-        // ดักจับการเคลื่อนไหวเพื่อต่อเวลาให้ถ้ากำลังใช้งานอยู่
         ['mousemove', 'mousedown', 'keypress', 'touchmove', 'scroll', 'click'].forEach(event => {
             document.addEventListener(event, resetTimer, true);
         });
-        // =========================================================================================
 
         const today = new Date();
         document.getElementById('global-month').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
@@ -495,23 +443,19 @@
                 .then(() => { document.getElementById('login-error').style.display = 'none'; })
                 .catch(error => { document.getElementById('login-error').style.display = 'block'; });
         };
-        window.handleLogout = () => { 
-            signOut(auth).then(() => { location.reload(); }); 
-        };
+        window.handleLogout = () => { signOut(auth).then(() => { location.reload(); }); };
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // ระบบเช็คความปลอดภัยตอนเปิดเว็บ: ถ้าเคยปิดเว็บไปนานกว่า 15 นาที ให้เตะออก
                 const lastActive = localStorage.getItem('smartFarm_lastActive');
                 if (lastActive && (Date.now() - parseInt(lastActive) > IDLE_TIMEOUT)) {
-                    localStorage.removeItem('smartFarm_lastActive'); // ล้างแสตมป์
+                    localStorage.removeItem('smartFarm_lastActive');
                     signOut(auth).then(() => {
                         alert("🔒 เซสชันหมดอายุ: คุณไม่ได้เปิดหน้าเว็บฟาร์มนานเกิน 15 นาที กรุณาล็อกอินใหม่เพื่อความปลอดภัยครับ");
                         location.reload();
                     });
-                    return; // หยุดการทำงานส่วนอื่น
+                    return;
                 }
-
                 myUid = user.uid;
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
@@ -519,18 +463,15 @@
                     cloudData = snapshot.val() || {};
                     window.refreshAllUI();
                 });
-                resetTimer(); // เริ่มจับเวลาครั้งแรกเมื่อล็อกอินเข้าเว็บสำเร็จ
+                resetTimer(); 
             } else {
                 myUid = null;
                 clearTimeout(inactivityTimer); 
-                localStorage.removeItem('smartFarm_lastActive'); // ล้างข้อมูลเมื่อล็อกเอาต์
+                localStorage.removeItem('smartFarm_lastActive');
             }
         });
 
-        function getStorage(key, isArray = true) {
-            if (cloudData[key] !== undefined) return cloudData[key];
-            return isArray ? [] : null;
-        }
+        function getStorage(key, isArray = true) { return cloudData[key] !== undefined ? cloudData[key] : (isArray ? [] : null); }
         function saveStorage(key, data) { if(myUid) set(ref(db, `users/${myUid}/${key}`), data); }
         function deleteStorage(key) { if(myUid) remove(ref(db, `users/${myUid}/${key}`)); }
 
@@ -560,22 +501,10 @@
                 return m === selectedMonth;
             });
         }
-
-        function formatChartLabels(records) {
-            return records.map(r => {
-                let d = new Date(r.t);
-                return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-            });
-        }
-
+        function formatChartLabels(records) { return records.map(r => { let d = new Date(r.t); return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }); }
         function calcHourlyProfile(records) {
-            let sums = Array(24).fill(0);
-            let counts = Array(24).fill(0);
-            records.forEach(r => {
-                const h = new Date(r.t).getHours();
-                sums[h] += r.v;
-                counts[h]++;
-            });
+            let sums = Array(24).fill(0), counts = Array(24).fill(0);
+            records.forEach(r => { const h = new Date(r.t).getHours(); sums[h] += r.v; counts[h]++; });
             return sums.map((s, i) => counts[i] ? parseFloat((s/counts[i]).toFixed(1)) : null);
         }
 
@@ -587,61 +516,30 @@
 
             const selectedZone = document.getElementById(`avg-water-zone-${loc}`).value;
             const waterData = getStorage(`sensor_water_acc_${selectedZone}_${loc}`, false);
-            
-            // เฉลี่ยปริมาณน้ำ
             const recordsWa = filterByMonth(waterData?.records, currentMonth);
             let avgWa = 0;
-            if (recordsWa.length > 0) {
-                const totalWa = recordsWa.reduce((sum, r) => sum + r.v, 0);
-                avgWa = (totalWa / recordsWa.length).toFixed(1);
-            }
+            if (recordsWa.length > 0) { avgWa = (recordsWa.reduce((sum, r) => sum + r.v, 0) / recordsWa.length).toFixed(1); }
             document.getElementById(`avg-wa-val-${loc}`).innerText = avgWa;
 
-            // ปริมาณน้ำฝนรวม (เฉพาะเดือนที่เลือก)
             const rfData = getStorage(`sensor_rainfall_${loc}`, false);
             const recordsRF_month = filterByMonth(rfData?.records, currentMonth);
             let sumRF = 0;
-            if (recordsRF_month.length > 0) {
-                sumRF = recordsRF_month.reduce((sum, r) => sum + r.v, 0).toFixed(1);
-            }
+            if (recordsRF_month.length > 0) { sumRF = recordsRF_month.reduce((sum, r) => sum + r.v, 0).toFixed(1); }
             document.getElementById(`sum-rf-val-${loc}`).innerText = sumRF;
 
-            // สรุปน้ำฝนรายปี (สะสมยอดรวมของแต่ละเดือนตลอดปี)
             let rfYearlySums = Array(12).fill(0);
-            if (rfData && rfData.records) {
-                rfData.records.forEach(r => {
-                    const d = new Date(r.t);
-                    if (d.getFullYear().toString() === currentYear) {
-                        rfYearlySums[d.getMonth()] += r.v;
-                    }
-                });
-            }
+            if (rfData && rfData.records) { rfData.records.forEach(r => { const d = new Date(r.t); if (d.getFullYear().toString() === currentYear) rfYearlySums[d.getMonth()] += r.v; }); }
             updateChart(myCharts[`yearly-rf-${loc}`], `น้ำฝนสะสมปี ${currentYear} (mm)`, monthsLabel, rfYearlySums.map(v => parseFloat(v.toFixed(1))), '#17a2b8');
 
-            // สรุปน้ำใช้รายปี (สะสมยอดรวมของแต่ละเดือนตลอดปี)
             let waYearlySums = Array(12).fill(0);
-            if (waterData && waterData.records) {
-                waterData.records.forEach(r => {
-                    const d = new Date(r.t);
-                    if (d.getFullYear().toString() === currentYear) {
-                        waYearlySums[d.getMonth()] += r.v;
-                    }
-                });
-            }
-            const waColor = loc === 'home' ? '#0056b3' : '#28a745';
-            updateChart(myCharts[`yearly-wa-${loc}`], `น้ำใช้สะสมปี ${currentYear} (L)`, monthsLabel, waYearlySums.map(v => parseFloat(v.toFixed(1))), waColor);
+            if (waterData && waterData.records) { waterData.records.forEach(r => { const d = new Date(r.t); if (d.getFullYear().toString() === currentYear) waYearlySums[d.getMonth()] += r.v; }); }
+            updateChart(myCharts[`yearly-wa-${loc}`], `น้ำใช้สะสมปี ${currentYear} (L)`, monthsLabel, waYearlySums.map(v => parseFloat(v.toFixed(1))), loc === 'home' ? '#0056b3' : '#28a745');
 
-            // กราฟความชื้น
             const smData = getStorage(`sensor_soil_moisture_${loc}`, false);
-            const recordsSM = filterByMonth(smData?.records, currentMonth);
-            const hourlySM = calcHourlyProfile(recordsSM);
-            updateChart(myCharts[`avg-sm-${loc}`], 'ความชื้นเฉลี่ย (%)', hours24, hourlySM, '#36a2eb');
+            updateChart(myCharts[`avg-sm-${loc}`], 'ความชื้นเฉลี่ย (%)', hours24, calcHourlyProfile(filterByMonth(smData?.records, currentMonth)), '#36a2eb');
 
-            // กราฟอุณหภูมิ
             const stData = getStorage(`sensor_soil_temp_${loc}`, false);
-            const recordsST = filterByMonth(stData?.records, currentMonth);
-            const hourlyST = calcHourlyProfile(recordsST);
-            updateChart(myCharts[`avg-st-${loc}`], 'อุณหภูมิเฉลี่ย (°C)', hours24, hourlyST, '#ff6384');
+            updateChart(myCharts[`avg-st-${loc}`], 'อุณหภูมิเฉลี่ย (°C)', hours24, calcHourlyProfile(filterByMonth(stData?.records, currentMonth)), '#ff6384');
         };
 
         function renderTodos(loc) {
@@ -664,6 +562,7 @@
             document.getElementById(`todo-text-${loc}`).value = ''; document.getElementById(`todo-date-${loc}`).value = '';
         };
 
+        // ฟังก์ชันวาดการ์ดแบบใหม่ แยกประเภทต้นไม้กับปุ๋ย
         window.renderIndividualTrees = (loc) => {
             const grid = document.getElementById(`tree-grid-${loc}`); 
             const trees = getStorage(`individual_trees_${loc}`, true); 
@@ -672,93 +571,111 @@
             const searchQuery = (document.getElementById(`search-tree-${loc}`)?.value || '').toLowerCase();
 
             trees.forEach((tree, originalIdx) => {
-                const formattedDate = tree.date ? new Date(tree.date).toLocaleDateString('th-TH') : 'ไม่ระบุ';
+                const formattedDate = tree.date ? new Date(tree.date).toLocaleDateString('th-TH') : '';
                 const formattedFertDate = tree.fertDate ? new Date(tree.fertDate).toLocaleDateString('th-TH') : '';
                 
                 if(searchQuery) {
-                    const targetStr = `${tree.name} ${formattedDate} ${formattedFertDate} ${tree.status} ${tree.note || ''} ${tree.soil || ''} ${tree.fert || ''}`.toLowerCase();
+                    const targetStr = `${tree.name || ''} ${formattedDate} ${formattedFertDate} ${tree.status || ''} ${tree.note || ''} ${tree.soil || ''} ${tree.fert || ''}`.toLowerCase();
                     if(!targetStr.includes(searchQuery)) return; 
                 }
 
-                const card = document.createElement('div'); card.className = `tree-card`;
-                if(loc === 'garden') card.style.borderLeftColor = '#0056b3';
+                const card = document.createElement('div'); 
+                card.className = `tree-card`;
                 
+                // เช็คว่าเป็นการ์ดบำรุงทั่วไป (ไม่มีชื่อต้นไม้) หรือไม่
+                const isFertOnly = !tree.name;
+                
+                if (isFertOnly) {
+                    card.style.borderLeftColor = '#856404'; // สีทอง สำหรับปุ๋ยทั่วไป
+                    card.style.backgroundColor = '#fffcf5';
+                } else if(loc === 'garden') {
+                    card.style.borderLeftColor = '#0056b3'; // สีฟ้า สำหรับต้นไม้บ้านสวน
+                }
+
                 let extraInfo = '';
                 if(tree.soil || tree.fert || tree.amount || tree.qty || tree.fertDate) {
-                    extraInfo += `<div style="background: #fdfbf7; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 0.9em; border: 1px dashed #d1c4a5;">`;
-                    extraInfo += `<div style="margin-bottom: 8px; font-weight: bold; color: #856404;">🧪 บันทึกการบำรุง:</div>`;
-                    if(tree.fertDate) extraInfo += `<div style="margin-bottom:4px; color:#28a745;">📅 <strong>วันที่บำรุงล่าสุด:</strong> ${formattedFertDate}</div>`;
+                    // จัดหน้าต่างปุ๋ยให้สวยขึ้น 
+                    extraInfo += `<div style="background: #fdfbf7; padding: 12px; border-radius: 8px; margin-top: ${isFertOnly ? '10px' : '15px'}; font-size: 0.9em; border: 1px dashed #d1c4a5;">`;
+                    if(!isFertOnly) extraInfo += `<div style="margin-bottom: 8px; font-weight: bold; color: #856404;">🧪 บันทึกการบำรุง:</div>`;
+                    
+                    if(tree.fertDate) extraInfo += `<div style="margin-bottom:4px; color:#28a745;">📅 <strong>วันที่บำรุง:</strong> ${formattedFertDate}</div>`;
                     if(tree.soil) extraInfo += `<div style="margin-bottom:4px;">🪨 <strong>ชนิดดิน:</strong> ${tree.soil}</div>`;
                     if(tree.fert) extraInfo += `<div style="margin-bottom:4px;">🧪 <strong>ชนิดปุ๋ย:</strong> ${tree.fert}</div>`;
                     if(tree.amount) extraInfo += `<div style="margin-bottom:4px;">⚖️ <strong>ปริมาณ:</strong> ${tree.amount}</div>`;
                     if(tree.qty) extraInfo += `<div>🌳 <strong>จำนวน:</strong> ${tree.qty} ต้น</div>`;
                     extraInfo += `</div>`;
                 }
-                card.innerHTML = `
-                    <button class="delete-tree-btn" onclick="window.deleteIndividualTree('${loc}', ${originalIdx})" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.2em; color: red; cursor: pointer;">🗑️</button>
-                    <h4>${tree.name}</h4>
-                    <p>🕒 <strong>วันที่บันทึก/ปลูก:</strong> ${formattedDate}</p>
-                    <p>📊 <strong>สถานะ:</strong> <span class="status-badge status-${tree.status}">${tree.status}</span></p>
-                    <p>📝 <strong>หมายเหตุ:</strong> ${tree.note || '-'}</p>
-                    ${extraInfo}
-                `;
+
+                let cardContent = `<button class="delete-tree-btn" onclick="window.deleteIndividualTree('${loc}', ${originalIdx})" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.2em; color: red; cursor: pointer;">🗑️</button>`;
+                
+                if (isFertOnly) {
+                    // รูปแบบการ์ด "บันทึกปุ๋ย/บำรุงทั่วไป"
+                    cardContent += `<h4 style="color: #856404;">🌾 บันทึกการบำรุง (ทั่วไป)</h4>`;
+                    if(tree.note) cardContent += `<p>📝 <strong>หมายเหตุ:</strong> ${tree.note}</p>`;
+                    cardContent += extraInfo;
+                } else {
+                    // รูปแบบการ์ด "ต้นไม้ปกติ"
+                    cardContent += `<h4>${tree.name}</h4>`;
+                    if(formattedDate) cardContent += `<p>🕒 <strong>วันที่บันทึก/ปลูก:</strong> ${formattedDate}</p>`;
+                    cardContent += `<p>📊 <strong>สถานะ:</strong> <span class="status-badge status-${tree.status}">${tree.status}</span></p>`;
+                    if(tree.note) cardContent += `<p>📝 <strong>หมายเหตุ:</strong> ${tree.note}</p>`;
+                    cardContent += extraInfo;
+                }
+                
+                card.innerHTML = cardContent;
                 grid.appendChild(card);
             });
         };
 
         window.addIndividualTree = (loc) => {
-            const name = document.getElementById(`t-name-${loc}`).value; 
+            const name = document.getElementById(`t-name-${loc}`).value.trim(); 
             const date = document.getElementById(`t-date-${loc}`).value;
             const status = document.getElementById(`t-status-${loc}`).value; 
             
-            const fertDate = document.getElementById(`t-fert-date-${loc}`).value;
-            const soil = document.getElementById(`t-soil-${loc}`).value;
-            const fert = document.getElementById(`t-fert-${loc}`).value; 
-            const amount = document.getElementById(`t-amount-${loc}`).value;
-            const qty = document.getElementById(`t-qty-${loc}`).value; 
+            const fertDateEl = document.getElementById(`t-fert-date-${loc}`);
+            const fertDate = fertDateEl ? fertDateEl.value : '';
             
-            const note = document.getElementById(`t-note-${loc}`).value;
+            const soil = document.getElementById(`t-soil-${loc}`).value.trim();
+            const fert = document.getElementById(`t-fert-${loc}`).value.trim(); 
+            const amount = document.getElementById(`t-amount-${loc}`).value.trim();
+            const qty = document.getElementById(`t-qty-${loc}`).value.trim(); 
+            const note = document.getElementById(`t-note-${loc}`).value.trim();
             
-            if(!name.trim()) return;
+            // เช็คว่า ถ้าไม่มีทั้งชื่อต้นไม้ และไม่มีข้อมูลปุ๋ย/หมายเหตุเลย ให้แจ้งเตือน
+            if(!name && !soil && !fert && !note) {
+                alert("⚠️ กรุณาระบุ 'ชื่อต้นไม้' หรือ 'ข้อมูลบำรุงดิน/ปุ๋ย/หมายเหตุ' อย่างน้อย 1 อย่างก่อนกดบันทึกครับ");
+                return;
+            }
+            
             const trees = getStorage(`individual_trees_${loc}`, true); 
             trees.push({name, date, status, fertDate, soil, fert, amount, qty, note}); 
             saveStorage(`individual_trees_${loc}`, trees);
             
-            // ล้างข้อมูลในกล่องหลังจากบันทึกเสร็จ
             document.getElementById(`t-name-${loc}`).value = ''; 
             document.getElementById(`t-date-${loc}`).value = '';
-            document.getElementById(`t-fert-date-${loc}`).value = '';
-        };
-        window.deleteIndividualTree = (loc, idx) => { if(confirm("คุณต้องการลบข้อมูลต้นไม้นี้ใช่หรือไม่?")) { const trees = getStorage(`individual_trees_${loc}`, true); trees.splice(idx, 1); saveStorage(`individual_trees_${loc}`, trees); } };
+            if(fertDateEl) fertDateEl.value = '';
+            document.getElementById(`t-soil-${loc}`).value = '';
+            document.getElementById(`t-fert-${loc}`).value = '';
+            document.getElementById(`t-amount-${loc}`).value = '';
+            document.getElementById(`t-qty-${loc}`).value = '';
+            document.getElementById(`t-note-${loc}`).value = '';
 
-        function hexToRgba(hex, alpha) {
-            let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
-            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-        }
+            window.renderIndividualTrees(loc); // รีเฟรชการ์ดทันที
+        };
+        
+        window.deleteIndividualTree = (loc, idx) => { if(confirm("คุณต้องการลบข้อมูลนี้ใช่หรือไม่?")) { const trees = getStorage(`individual_trees_${loc}`, true); trees.splice(idx, 1); saveStorage(`individual_trees_${loc}`, trees); window.renderIndividualTrees(loc); } };
+
+        function hexToRgba(hex, alpha) { let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16); return `rgba(${r}, ${g}, ${b}, ${alpha})`; }
         Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"; Chart.defaults.color = '#777';
         let myCharts = {};
 
         function initCharts() {
-            const config = (type) => ({
-                type: type, data: { labels: [], datasets: [] },
-                options: { 
-                    responsive: true, maintainAspectRatio: false, animation: { duration: 0 }, interaction: { mode: 'index', intersect: false }, 
-                    plugins: { legend: { display: false }, tooltip: { usePointStyle: true, bodyFont: { size: 14, weight: 'bold' } } }, 
-                    scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 8, font: {size: 11} } }, y: { grid: { color: 'rgba(0,0,0,0.05)', drawBorder: false } } }
-                }
-            });
+            const config = (type) => ({ type: type, data: { labels: [], datasets: [] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: 0 }, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false }, tooltip: { usePointStyle: true, bodyFont: { size: 14, weight: 'bold' } } }, scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 8, font: {size: 11} } }, y: { grid: { color: 'rgba(0,0,0,0.05)', drawBorder: false } } } } });
             ['home', 'garden'].forEach(l => {
-                myCharts[`rf-${l}`] = new Chart(document.getElementById(`chart-rf-${l}`).getContext('2d'), config('bar'));
-                myCharts[`wa-${l}`] = new Chart(document.getElementById(`chart-wa-${l}`).getContext('2d'), config('bar'));
-                myCharts[`sm-${l}`] = new Chart(document.getElementById(`chart-sm-${l}`).getContext('2d'), config('line'));
-                myCharts[`li-${l}`] = new Chart(document.getElementById(`chart-li-${l}`).getContext('2d'), config('line'));
-                myCharts[`st-${l}`] = new Chart(document.getElementById(`chart-st-${l}`).getContext('2d'), config('line'));
-                
-                myCharts[`avg-sm-${l}`] = new Chart(document.getElementById(`chart-avg-sm-${l}`).getContext('2d'), config('line'));
-                myCharts[`avg-st-${l}`] = new Chart(document.getElementById(`chart-avg-st-${l}`).getContext('2d'), config('line'));
-                
-                myCharts[`yearly-rf-${l}`] = new Chart(document.getElementById(`chart-yearly-rf-${l}`).getContext('2d'), config('bar'));
-                myCharts[`yearly-wa-${l}`] = new Chart(document.getElementById(`chart-yearly-wa-${l}`).getContext('2d'), config('bar'));
+                myCharts[`rf-${l}`] = new Chart(document.getElementById(`chart-rf-${l}`).getContext('2d'), config('bar')); myCharts[`wa-${l}`] = new Chart(document.getElementById(`chart-wa-${l}`).getContext('2d'), config('bar'));
+                myCharts[`sm-${l}`] = new Chart(document.getElementById(`chart-sm-${l}`).getContext('2d'), config('line')); myCharts[`li-${l}`] = new Chart(document.getElementById(`chart-li-${l}`).getContext('2d'), config('line')); myCharts[`st-${l}`] = new Chart(document.getElementById(`chart-st-${l}`).getContext('2d'), config('line'));
+                myCharts[`avg-sm-${l}`] = new Chart(document.getElementById(`chart-avg-sm-${l}`).getContext('2d'), config('line')); myCharts[`avg-st-${l}`] = new Chart(document.getElementById(`chart-avg-st-${l}`).getContext('2d'), config('line'));
+                myCharts[`yearly-rf-${l}`] = new Chart(document.getElementById(`chart-yearly-rf-${l}`).getContext('2d'), config('bar')); myCharts[`yearly-wa-${l}`] = new Chart(document.getElementById(`chart-yearly-wa-${l}`).getContext('2d'), config('bar'));
             });
         }
 
@@ -768,27 +685,14 @@
             const savedTreeGarden = getStorage('tree_count_garden', false); document.getElementById('tree-garden').innerText = (savedTreeGarden !== null) ? Number(savedTreeGarden).toLocaleString() : "0";
 
             ['home', 'garden'].forEach(loc => {
-                const types = [
-                    {id: 'rainfall', key: 'rf', label: 'ปริมาณน้ำฝน (mm)', color: '#4bc0c0'}, 
-                    {id: 'soil_moisture', key: 'sm', label: 'ความชื้นในดิน (%)', color: '#36a2eb'},
-                    {id: 'light_intensity', key: 'li', label: 'ความเข้มแสง (Lux)', color: '#ffce56'}, 
-                    {id: 'soil_temp', key: 'st', label: 'อุณหภูมิดิน (°C)', color: '#ff6384'}
-                ];
-                
+                const types = [ {id: 'rainfall', key: 'rf', label: 'ปริมาณน้ำฝน (mm)', color: '#4bc0c0'}, {id: 'soil_moisture', key: 'sm', label: 'ความชื้นในดิน (%)', color: '#36a2eb'}, {id: 'light_intensity', key: 'li', label: 'ความเข้มแสง (Lux)', color: '#ffce56'}, {id: 'soil_temp', key: 'st', label: 'อุณหภูมิดิน (°C)', color: '#ff6384'} ];
                 const viewWaterZone = document.getElementById(`view-water-zone-${loc}`).value;
                 types.push({id: `water_acc_${viewWaterZone}`, key: 'wa', label: `ปริมาณน้ำ จุดที่ ${viewWaterZone} (L)`, color: '#9966ff'});
-
                 types.forEach(type => {
                     const savedData = getStorage(`sensor_${type.id}_${loc}`, false);
                     let records = filterByMonth(savedData?.records, currentMonth);
-                    
-                    if (records && records.length > 0) {
-                        const labels = formatChartLabels(records);
-                        const values = records.map(r => r.v);
-                        updateChart(myCharts[`${type.key}-${loc}`], type.label, labels, values, type.color);
-                    } else {
-                        updateChart(myCharts[`${type.key}-${loc}`], type.label, [], [], type.color);
-                    }
+                    if (records && records.length > 0) updateChart(myCharts[`${type.key}-${loc}`], type.label, formatChartLabels(records), records.map(r => r.v), type.color);
+                    else updateChart(myCharts[`${type.key}-${loc}`], type.label, [], [], type.color);
                 });
             });
         };
@@ -797,38 +701,28 @@
             const files = event.target.files; if(files.length === 0) return;
             const selectedMode = document.getElementById(`data-type-${loc}`).value; 
             const uploadWaterZone = document.getElementById(`upload-water-zone-${loc}`).value;
-
             Array.from(files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     try {
-                        const data = e.target.result;
-                        const workbook = XLSX.read(data, {type: 'binary', cellDates: true});
+                        const data = e.target.result; const workbook = XLSX.read(data, {type: 'binary', cellDates: true});
                         const excelData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1, raw: false});
-                        
                         let targetType = '';
-                        if (selectedMode === 'tree_count') {
-                            targetType = 'tree_count';
-                        } else {
+                        if (selectedMode === 'tree_count') targetType = 'tree_count';
+                        else {
                             let sampleVal = "";
                             for(let i = 0; i < Math.min(20, excelData.length); i++) {
                                 if(excelData[i] && excelData[i][1] != null) { 
                                     let val = String(excelData[i][1]).toUpperCase();
-                                    if(val !== "VALUE" && val.trim() !== "") { 
-                                        sampleVal = val; 
-                                        break; 
-                                    }
+                                    if(val !== "VALUE" && val.trim() !== "") { sampleVal = val; break; }
                                 }
                             }
-                            if(sampleVal.includes('LX')) targetType = 'light_intensity';
-                            else if(sampleVal.includes('MM')) targetType = 'rainfall';
-                            else if(sampleVal.includes('%') || sampleVal.includes('RH')) targetType = 'soil_moisture';
-                            else if(sampleVal.includes('C') || sampleVal.includes('℃')) targetType = 'soil_temp';
+                            if(sampleVal.includes('LX')) targetType = 'light_intensity'; else if(sampleVal.includes('MM')) targetType = 'rainfall';
+                            else if(sampleVal.includes('%') || sampleVal.includes('RH')) targetType = 'soil_moisture'; else if(sampleVal.includes('C') || sampleVal.includes('℃')) targetType = 'soil_temp';
                             else if(sampleVal.includes('L')) targetType = `water_acc_${uploadWaterZone}`;
                         }
-                        
-                        if(targetType) { processData(excelData, loc, targetType); } 
-                        else { console.warn("ไม่สามารถระบุชนิดข้อมูลได้จากไฟล์:", file.name); }
+                        if(targetType) processData(excelData, loc, targetType); 
+                        else console.warn("ไม่สามารถระบุชนิดข้อมูลได้จากไฟล์:", file.name);
                     } catch(error) { console.error("ไฟล์ขัดข้อง: ", error); }
                 };
                 reader.readAsBinaryString(file);
@@ -840,23 +734,14 @@
             let records = [];
             for (let i = 1; i < data.length; i++) {
                 if (data[i] && data[i][0] != null && data[i][1] != null) { 
-                    let rawLabel = data[i][0];
-                    let dateObj = (rawLabel instanceof Date) ? rawLabel : new Date(rawLabel);
-                    
-                    let cleanStr = String(data[i][1]).replace(/[^0-9.-]/g, '');
-                    const numValue = Number(cleanStr);
-                    if(!isNaN(dateObj.getTime()) && !isNaN(numValue) && cleanStr !== "") { 
-                        records.push({ t: dateObj.getTime(), v: numValue }); 
-                    }
+                    let rawLabel = data[i][0]; let dateObj = (rawLabel instanceof Date) ? rawLabel : new Date(rawLabel);
+                    let cleanStr = String(data[i][1]).replace(/[^0-9.-]/g, ''); const numValue = Number(cleanStr);
+                    if(!isNaN(dateObj.getTime()) && !isNaN(numValue) && cleanStr !== "") records.push({ t: dateObj.getTime(), v: numValue }); 
                 }
             }
             if(records.length === 0) return;
-            
-            if (type === 'tree_count') { 
-                saveStorage(`tree_count_${loc}`, records[records.length - 1].v); 
-            } else { 
-                saveStorage(`sensor_${type}_${loc}`, { records: records }); 
-            }
+            if (type === 'tree_count') saveStorage(`tree_count_${loc}`, records[records.length - 1].v); 
+            else saveStorage(`sensor_${type}_${loc}`, { records: records }); 
         }
 
         function updateChart(chart, label, labels, data, color) {
@@ -864,43 +749,22 @@
             const isLine = chart.config.type === 'line'; const ctx = chart.canvas.getContext('2d');
             const gradient = ctx.createLinearGradient(0, 0, 0, chart.canvas.height || 200);
             gradient.addColorStop(0, hexToRgba(color, 0.5)); gradient.addColorStop(1, hexToRgba(color, 0.05));
-            const datasetConfig = {
-                label: label, data: data, borderColor: color, backgroundColor: isLine ? gradient : hexToRgba(color, 0.8), 
-                borderWidth: isLine ? 2 : 0, fill: isLine, tension: 0.1, 
-                pointBackgroundColor: '#ffffff', pointBorderColor: color, pointBorderWidth: 2, pointRadius: data.length > 30 ? 0 : 3, pointHoverRadius: 5, borderRadius: isLine ? 0 : 4
-            };
+            const datasetConfig = { label: label, data: data, borderColor: color, backgroundColor: isLine ? gradient : hexToRgba(color, 0.8), borderWidth: isLine ? 2 : 0, fill: isLine, tension: 0.1, pointBackgroundColor: '#ffffff', pointBorderColor: color, pointBorderWidth: 2, pointRadius: data.length > 30 ? 0 : 3, pointHoverRadius: 5, borderRadius: isLine ? 0 : 4 };
             if (dsIndex >= 0) chart.data.datasets[dsIndex] = datasetConfig; else chart.data.datasets.push(datasetConfig);
             chart.update(); 
         }
 
         window.clearData = (type, loc) => {
             if (confirm(`คุณต้องการลบข้อมูลกราฟนี้บน Cloud ใช่หรือไม่?`)) {
-                if (type === 'tree_count') { deleteStorage(`tree_count_${loc}`); } 
-                else if (type === 'water_acc') { 
-                    const zone = document.getElementById(`view-water-zone-${loc}`).value;
-                    deleteStorage(`sensor_water_acc_${zone}_${loc}`); 
-                }
-                else { deleteStorage(`sensor_${type}_${loc}`); }
+                if (type === 'tree_count') deleteStorage(`tree_count_${loc}`); 
+                else if (type === 'water_acc') { const zone = document.getElementById(`view-water-zone-${loc}`).value; deleteStorage(`sensor_water_acc_${zone}_${loc}`); }
+                else deleteStorage(`sensor_${type}_${loc}`); 
             }
         };
 
         let currentFullscreenChartId = null;
-        window.openFullscreen = (chartId, title) => {
-            const modal = document.getElementById('chart-modal'); const canvas = document.getElementById(`chart-${chartId}`);
-            document.getElementById('modal-title').innerText = title; currentFullscreenChartId = chartId;
-            document.getElementById('modal-body').appendChild(canvas); modal.style.display = 'flex'; myCharts[chartId].resize(); 
-        };
-        window.closeFullscreen = (event, forceClose = false) => {
-            const modal = document.getElementById('chart-modal');
-            if (forceClose || (event && event.target === modal)) {
-                if (currentFullscreenChartId) {
-                    const originalContainer = document.getElementById(`container-${currentFullscreenChartId}`);
-                    const canvas = document.getElementById(`chart-${currentFullscreenChartId}`);
-                    originalContainer.appendChild(canvas); modal.style.display = 'none';
-                    myCharts[currentFullscreenChartId].resize(); currentFullscreenChartId = null;
-                }
-            }
-        };
+        window.openFullscreen = (chartId, title) => { const modal = document.getElementById('chart-modal'); const canvas = document.getElementById(`chart-${chartId}`); document.getElementById('modal-title').innerText = title; currentFullscreenChartId = chartId; document.getElementById('modal-body').appendChild(canvas); modal.style.display = 'flex'; myCharts[chartId].resize(); };
+        window.closeFullscreen = (event, forceClose = false) => { const modal = document.getElementById('chart-modal'); if (forceClose || (event && event.target === modal)) { if (currentFullscreenChartId) { const originalContainer = document.getElementById(`container-${currentFullscreenChartId}`); const canvas = document.getElementById(`chart-${currentFullscreenChartId}`); originalContainer.appendChild(canvas); modal.style.display = 'none'; myCharts[currentFullscreenChartId].resize(); currentFullscreenChartId = null; } } };
 
         document.addEventListener('DOMContentLoaded', () => { initCharts(); });
     </script>
