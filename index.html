@@ -134,6 +134,7 @@
         <!-- หน้าที่ 1 : Management & Averages -->
         <div id="page1" class="page-content active">
             <div class="management-container">
+                <!-- ฝั่งบ้าน -->
                 <div class="split-screen">
                     <h1>บ้าน</h1>
                     <div class="card" style="background: #f0f8ff; border-color: #cce5ff;">
@@ -176,6 +177,7 @@
                     </div>
                 </div>
 
+                <!-- ฝั่งบ้านสวน -->
                 <div class="split-screen">
                     <h1>บ้านสวน</h1>
                     <div class="card" style="background: #f4fcf5; border-color: #c3e6cb;">
@@ -543,29 +545,91 @@
         };
 
         function renderTodos(loc) {
-            const list = document.getElementById(`list-todo-${loc}`); const todos = getStorage(`todos_${loc}`, true); list.innerHTML = '';
+            const list = document.getElementById(`list-todo-${loc}`); 
+            const todos = getStorage(`todos_${loc}`, true); 
+            list.innerHTML = '';
+            
             todos.forEach((todo, idx) => {
-                const li = document.createElement('li'); if(todo.completed) li.className = 'completed';
-                const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = todo.completed;
-                cb.onchange = () => { todos[idx].completed = !todos[idx].completed; saveStorage(`todos_${loc}`, todos); };
-                const sp = document.createElement('span'); sp.className = 'task-text'; sp.innerText = todo.text;
-                li.appendChild(cb); li.appendChild(sp);
-                const del = document.createElement('button'); del.className = 'delete-btn'; del.innerHTML = '🗑️';
-                del.onclick = () => { todos.splice(idx, 1); saveStorage(`todos_${loc}`, todos); };
-                li.appendChild(del); list.appendChild(li);
+                const li = document.createElement('li'); 
+                if(todo.completed) li.className = 'completed';
+                
+                const cb = document.createElement('input'); 
+                cb.type = 'checkbox'; 
+                cb.checked = todo.completed;
+                cb.onchange = () => { 
+                    todos[idx].completed = !todos[idx].completed; 
+                    saveStorage(`todos_${loc}`, todos); 
+                    renderTodos(loc);
+                };
+                
+                const sp = document.createElement('span'); 
+                sp.className = 'task-text'; 
+                sp.innerText = todo.text;
+                
+                li.appendChild(cb); 
+                li.appendChild(sp);
+
+                if(todo.date) {
+                    const dateObj = new Date(todo.date);
+                    const dateSpan = document.createElement('span');
+                    dateSpan.className = 'due-date';
+                    dateSpan.innerHTML = `🕒 ${dateObj.toLocaleDateString('th-TH')} ${dateObj.getHours()}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
+                    
+                    const calBtn = document.createElement('button');
+                    calBtn.innerHTML = '🗓️';
+                    calBtn.style.background = 'none';
+                    calBtn.style.border = 'none';
+                    calBtn.style.cursor = 'pointer';
+                    calBtn.style.marginLeft = '5px';
+                    calBtn.title = 'บันทึกลง Google Calendar';
+                    
+                    calBtn.onclick = () => {
+                        const dEnd = new Date(dateObj.getTime() + 60*60*1000); 
+                        const startStr = dateObj.toISOString().replace(/-|:|\.\d\d\d/g,"");
+                        const endStr = dEnd.toISOString().replace(/-|:|\.\d\d\d/g,"");
+                        const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(todo.text)}&dates=${startStr}/${endStr}&details=${encodeURIComponent('รายการจาก Smart Farm Dashboard')}`;
+                        window.open(url, '_blank');
+                    };
+                    
+                    dateSpan.appendChild(calBtn);
+                    li.appendChild(dateSpan);
+                }
+
+                const del = document.createElement('button'); 
+                del.className = 'delete-btn'; 
+                del.innerHTML = '🗑️';
+                del.style.background = 'none';
+                del.style.border = 'none';
+                del.style.cursor = 'pointer';
+                del.style.color = 'red';
+                del.onclick = () => { 
+                    todos.splice(idx, 1); 
+                    saveStorage(`todos_${loc}`, todos); 
+                    renderTodos(loc); 
+                };
+                li.appendChild(del); 
+                
+                list.appendChild(li);
             });
         }
+
         window.addTodo = (loc) => {
-            const txt = document.getElementById(`todo-text-${loc}`).value; const dt = document.getElementById(`todo-date-${loc}`).value;
+            const txt = document.getElementById(`todo-text-${loc}`).value; 
+            const dt = document.getElementById(`todo-date-${loc}`).value;
             if(!txt.trim()) return;
-            const todos = getStorage(`todos_${loc}`, true); todos.push({text: txt, date: dt, completed: false}); saveStorage(`todos_${loc}`, todos);
-            document.getElementById(`todo-text-${loc}`).value = ''; document.getElementById(`todo-date-${loc}`).value = '';
+            
+            const todos = getStorage(`todos_${loc}`, true); 
+            todos.push({text: txt, date: dt, completed: false}); 
+            saveStorage(`todos_${loc}`, todos);
+            
+            document.getElementById(`todo-text-${loc}`).value = ''; 
+            document.getElementById(`todo-date-${loc}`).value = '';
+            
+            renderTodos(loc); 
         };
 
         window.renderIndividualTrees = (loc) => {
             const grid = document.getElementById(`tree-grid-${loc}`); 
-            
-            // 🔥 ป้องกันบัค Firebase แปลงร่างข้อมูล
             let rawTrees = getStorage(`individual_trees_${loc}`, true); 
             const trees = Array.isArray(rawTrees) ? rawTrees : Object.values(rawTrees || {});
             
@@ -574,7 +638,6 @@
             const searchQuery = (document.getElementById(`search-tree-${loc}`)?.value || '').toLowerCase();
 
             trees.forEach((tree, originalIdx) => {
-                // ป้องกัน Error กรณี tree เป็นค่าว่างจากการลบข้อมูล
                 if (!tree) return; 
 
                 const formattedDate = tree.date ? new Date(tree.date).toLocaleDateString('th-TH') : '';
@@ -649,7 +712,6 @@
                     return;
                 }
                 
-                // 🔥 ป้องกันบัค Firebase แปลงร่างข้อมูล
                 let rawTrees = getStorage(`individual_trees_${loc}`, true); 
                 let trees = Array.isArray(rawTrees) ? rawTrees : Object.values(rawTrees || {});
                 
@@ -666,7 +728,6 @@
                 document.getElementById(`t-note-${loc}`).value = '';
 
                 window.renderIndividualTrees(loc);
-                
                 setTimeout(() => alert("✅ บันทึกข้อมูลเรียบร้อยแล้ว!"), 100);
             } catch(e) {
                 alert("เกิดข้อผิดพลาดในการบันทึก: " + e.message);
@@ -675,10 +736,8 @@
         
         window.deleteIndividualTree = (loc, idx) => { 
             if(confirm("คุณต้องการลบข้อมูลนี้ใช่หรือไม่?")) { 
-                // 🔥 ป้องกันบัค Firebase แปลงร่างข้อมูล
                 let rawTrees = getStorage(`individual_trees_${loc}`, true); 
                 let trees = Array.isArray(rawTrees) ? rawTrees : Object.values(rawTrees || {});
-                
                 trees.splice(idx, 1); 
                 saveStorage(`individual_trees_${loc}`, trees); 
                 window.renderIndividualTrees(loc); 
