@@ -77,6 +77,7 @@
         .tree-page-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .tree-form-container { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .form-section { border: 1px solid #eef0f2; padding: 15px 20px; border-radius: 12px; margin-bottom: 15px; background: #f8fafc;}
+        .form-section.upload-section { background: #e9ecef; border-color: #ced4da; }
         .form-section h4 { margin-top: 0; margin-bottom: 15px; color: #333; font-size: 1.1em; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px;}
         .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
         .input-grid input, .input-grid select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: inherit; font-size: 1em; width: 100%; box-sizing: border-box;}
@@ -134,6 +135,7 @@
         <!-- หน้าที่ 1 : Management & Averages -->
         <div id="page1" class="page-content active">
             <div class="management-container">
+                <!-- ฝั่งบ้าน -->
                 <div class="split-screen">
                     <h1>บ้าน</h1>
                     <div class="card" style="background: #f0f8ff; border-color: #cce5ff;">
@@ -173,9 +175,12 @@
                             <button onclick="window.addTodo('home')">เพิ่มรายการ</button>
                         </div>
                         <ul id="list-todo-home" class="todo-list"></ul>
+                        <!-- ปุ่มดาวน์โหลด ICS รวม -->
+                        <button class="full-width-btn" style="margin-top: 15px; background-color: #ffc107; color: #333;" onclick="window.downloadICS('home')">🗓️ โหลดข้อมูลทั้งหมดลงปฏิทิน (.ics)</button>
                     </div>
                 </div>
 
+                <!-- ฝั่งบ้านสวน -->
                 <div class="split-screen">
                     <h1>บ้านสวน</h1>
                     <div class="card" style="background: #f4fcf5; border-color: #c3e6cb;">
@@ -215,6 +220,8 @@
                             <button onclick="window.addTodo('garden')">เพิ่มรายการ</button>
                         </div>
                         <ul id="list-todo-garden" class="todo-list"></ul>
+                        <!-- ปุ่มดาวน์โหลด ICS รวม -->
+                        <button class="full-width-btn" style="margin-top: 15px; background-color: #ffc107; color: #333;" onclick="window.downloadICS('garden')">🗓️ โหลดข้อมูลทั้งหมดลงปฏิทิน (.ics)</button>
                     </div>
                 </div>
             </div>
@@ -342,7 +349,15 @@
                             <input type="number" id="t-qty-home" placeholder="จำนวนต้นที่ใส่ (ระบุตัวเลข)">
                         </div>
                     </div>
-                    <button class="full-width-btn" onclick="window.addIndividualTree('home')">➕ บันทึกข้อมูลขึ้น Cloud</button>
+                    <button class="full-width-btn" onclick="window.addIndividualTree('home')">➕ บันทึกข้อมูลทีละรายการ</button>
+                    
+                    <div class="form-section upload-section" style="margin-top: 15px;">
+                        <h4 style="margin-bottom: 5px;">📥 อัปโหลดข้อมูลจาก Excel (เพิ่มทีเดียวทั้งหมด)</h4>
+                        <div style="font-size: 0.85em; color: #555; margin-bottom: 10px;">
+                            *จัดเรียงหัวคอลัมน์แถวแรกตามนี้: 1.ชื่อต้นไม้ | 2.วันที่บันทึก | 3.สถานะ | 4.วันที่บำรุง | 5.ชนิดดิน | 6.ชนิดปุ๋ย | 7.ปริมาณ | 8.จำนวนต้น | 9.หมายเหตุ
+                        </div>
+                        <input type="file" accept=".xlsx, .xls" onchange="window.handleBulkTreeUpload(event, 'home')" style="padding: 5px; width: 100%; box-sizing: border-box;">
+                    </div>
                 </div>
                 <input type="text" id="search-tree-home" class="search-box" placeholder="🔍 ค้นหาชื่อต้นไม้, วันที่, ชนิดปุ๋ย..." onkeyup="window.renderIndividualTrees('home')">
                 <div id="tree-grid-home" class="tree-grid"></div>
@@ -376,7 +391,15 @@
                             <input type="number" id="t-qty-garden" placeholder="จำนวนต้นที่ใส่">
                         </div>
                     </div>
-                    <button class="full-width-btn" onclick="window.addIndividualTree('garden')">➕ บันทึกข้อมูลขึ้น Cloud</button>
+                    <button class="full-width-btn" onclick="window.addIndividualTree('garden')">➕ บันทึกข้อมูลทีละรายการ</button>
+                    
+                    <div class="form-section upload-section" style="margin-top: 15px;">
+                        <h4 style="margin-bottom: 5px;">📥 อัปโหลดข้อมูลจาก Excel (เพิ่มทีเดียวทั้งหมด)</h4>
+                        <div style="font-size: 0.85em; color: #555; margin-bottom: 10px;">
+                            *จัดเรียงหัวคอลัมน์แถวแรกตามนี้: 1.ชื่อต้นไม้ | 2.วันที่บันทึก | 3.สถานะ | 4.วันที่บำรุง | 5.ชนิดดิน | 6.ชนิดปุ๋ย | 7.ปริมาณ | 8.จำนวนต้น | 9.หมายเหตุ
+                        </div>
+                        <input type="file" accept=".xlsx, .xls" onchange="window.handleBulkTreeUpload(event, 'garden')" style="padding: 5px; width: 100%; box-sizing: border-box;">
+                    </div>
                 </div>
                 <input type="text" id="search-tree-garden" class="search-box" placeholder="🔍 ค้นหาชื่อต้นไม้, วันที่, ชนิดปุ๋ย..." onkeyup="window.renderIndividualTrees('garden')">
                 <div id="tree-grid-garden" class="tree-grid"></div>
@@ -542,7 +565,6 @@
             updateChart(myCharts[`avg-st-${loc}`], 'อุณหภูมิเฉลี่ย (°C)', hours24, calcHourlyProfile(filterByMonth(stData?.records, currentMonth)), '#ff6384');
         };
 
-        // โค้ดส่วนจัดการ To-Do List (พร้อมปฏิทิน) ที่ถูกต้อง
         function renderTodos(loc) {
             const list = document.getElementById(`list-todo-${loc}`); 
             const todos = getStorage(`todos_${loc}`, true); 
@@ -625,6 +647,48 @@
             document.getElementById(`todo-date-${loc}`).value = '';
             
             renderTodos(loc); 
+        };
+
+        // ฟังก์ชันสร้างไฟล์ .ics สำหรับกวาดรายการทั้งหมดลงปฏิทิน
+        window.downloadICS = (loc) => {
+            const todos = getStorage(`todos_${loc}`, true);
+            const tasksWithDate = todos.filter(t => t.date && !t.completed);
+
+            if(tasksWithDate.length === 0) {
+                alert('⚠️ ไม่มีรายการที่ตั้งเวลาไว้ หรือรายการทั้งหมดเสร็จสิ้นแล้วครับ');
+                return;
+            }
+
+            let icsContent = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Smart Farm Dashboard//TH\r\nCALSCALE:GREGORIAN\r\n";
+
+            tasksWithDate.forEach(todo => {
+                const startDate = new Date(todo.date);
+                const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // เผื่อเวลาให้ 1 ชั่วโมง
+
+                const formatICSDate = (date) => {
+                    const pad = (n) => String(n).padStart(2, '0');
+                    return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}T${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
+                };
+
+                icsContent += "BEGIN:VEVENT\r\n";
+                icsContent += `SUMMARY:${todo.text}\r\n`;
+                icsContent += `DTSTART:${formatICSDate(startDate)}\r\n`;
+                icsContent += `DTEND:${formatICSDate(endDate)}\r\n`;
+                icsContent += `DESCRIPTION:รายการจาก Smart Farm Dashboard (${loc === 'home' ? 'บ้าน' : 'บ้านสวน'})\r\n`;
+                icsContent += "END:VEVENT\r\n";
+            });
+
+            icsContent += "END:VCALENDAR\r\n";
+
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Farm_Tasks_${loc}.ics`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         };
 
         window.renderIndividualTrees = (loc) => {
@@ -731,6 +795,62 @@
             } catch(e) {
                 alert("เกิดข้อผิดพลาดในการบันทึก: " + e.message);
             }
+        };
+
+        window.handleBulkTreeUpload = (event, loc) => {
+            const file = event.target.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, {type: 'binary', cellDates: true});
+                    const excelData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1});
+
+                    let rawTrees = getStorage(`individual_trees_${loc}`, true);
+                    let trees = Array.isArray(rawTrees) ? rawTrees : Object.values(rawTrees || {});
+                    
+                    let addedCount = 0;
+
+                    const parseDate = (val) => {
+                        if (!val) return '';
+                        if (val instanceof Date) return val.toISOString().split('T')[0];
+                        const parsed = new Date(val);
+                        if(!isNaN(parsed.getTime())) return parsed.toISOString().split('T')[0];
+                        return String(val);
+                    };
+
+                    for(let i = 1; i < excelData.length; i++) {
+                        const row = excelData[i];
+                        if(!row || row.length === 0) continue;
+                        
+                        const name = row[0] ? String(row[0]).trim() : '';
+                        const date = parseDate(row[1]);
+                        const status = row[2] ? String(row[2]).trim() : 'ปกติ';
+                        const fertDate = parseDate(row[3]);
+                        const soil = row[4] ? String(row[4]).trim() : '';
+                        const fert = row[5] ? String(row[5]).trim() : '';
+                        const amount = row[6] ? String(row[6]).trim() : '';
+                        const qty = row[7] ? String(row[7]).trim() : '';
+                        const note = row[8] ? String(row[8]).trim() : '';
+
+                        if(name || soil || fert || note || amount || qty || fertDate || date) {
+                            trees.push({name, date, status, fertDate, soil, fert, amount, qty, note});
+                            addedCount++;
+                        }
+                    }
+
+                    saveStorage(`individual_trees_${loc}`, trees);
+                    window.renderIndividualTrees(loc);
+                    alert(`✅ อัปโหลดสำเร็จ! เพิ่มข้อมูลทั้งหมด ${addedCount} รายการ`);
+
+                } catch(error) {
+                    alert("เกิดข้อผิดพลาดในการอ่านไฟล์ Excel: " + error.message);
+                }
+            };
+            reader.readAsBinaryString(file);
+            event.target.value = ''; 
         };
         
         window.deleteIndividualTree = (loc, idx) => { 
