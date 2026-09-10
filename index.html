@@ -482,7 +482,9 @@
                 myUid = user.uid;
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
-                onValue(ref(db, 'users/' + myUid), (snapshot) => {
+                
+                // 🔥 เปลี่ยนระบบการดึงข้อมูลจาก User ส่วนตัว เป็นโฟลเดอร์ส่วนรวม (Shared Data)
+                onValue(ref(db, 'shared_farm_data'), (snapshot) => {
                     cloudData = snapshot.val() || {};
                     window.refreshAllUI();
                 });
@@ -495,8 +497,10 @@
         });
 
         function getStorage(key, isArray = true) { return cloudData[key] !== undefined ? cloudData[key] : (isArray ? [] : null); }
-        function saveStorage(key, data) { if(myUid) set(ref(db, `users/${myUid}/${key}`), data); }
-        function deleteStorage(key) { if(myUid) remove(ref(db, `users/${myUid}/${key}`)); }
+        
+        // 🔥 เปลี่ยนระบบเซฟข้อมูล ให้บันทึกลงโฟลเดอร์ส่วนรวม (ทุกคนเห็นตรงกัน)
+        function saveStorage(key, data) { if(myUid) set(ref(db, `shared_farm_data/${key}`), data); }
+        function deleteStorage(key) { if(myUid) remove(ref(db, `shared_farm_data/${key}`)); }
 
         window.refreshAllUI = () => {
             renderTodos('home'); renderTodos('garden');
@@ -663,7 +667,7 @@
 
             tasksWithDate.forEach(todo => {
                 const startDate = new Date(todo.date);
-                const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // เผื่อเวลาให้ 1 ชั่วโมง
+                const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
 
                 const formatICSDate = (date) => {
                     const pad = (n) => String(n).padStart(2, '0');
