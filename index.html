@@ -139,6 +139,7 @@
                 <div class="split-screen">
                     <h1>บ้าน</h1>
                     
+                    <!-- ส่วนพยากรณ์อากาศแบบ Real-time (บ้าน) -->
                     <div class="card" style="background: linear-gradient(135deg, #3a7bd5, #3a6073); color: white; border: none; padding: 20px;">
                         <h3 style="color: white; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; display: flex; justify-content: space-between;">
                             <span>📍 สภาพอากาศวันนี้</span>
@@ -186,7 +187,7 @@
                         <div class="chart-container mini-chart"><canvas id="chart-yearly-wa-home"></canvas></div>
                     </div>
 
-                    <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ (หน้า 1) -->
+                    <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ -->
                     <div class="card" style="border: 2px solid #ff9800; background: #fffdf5;">
                         <div class="card-header" style="border-bottom-color: #ffcc80;">
                             <h3 style="display:block; color: #e65100;">⚠️ บันทึกเหตุการณ์ผิดปกติ</h3>
@@ -211,6 +212,7 @@
                             <button onclick="window.addTodo('home')">เพิ่มรายการ</button>
                         </div>
                         <ul id="list-todo-home" class="todo-list"></ul>
+                        <!-- ปุ่มดาวน์โหลด ICS รวม -->
                         <button class="full-width-btn" style="margin-top: 15px; background-color: #ffc107; color: #333;" onclick="window.downloadICS('home')">🗓️ โหลดข้อมูลทั้งหมดลงปฏิทิน (.ics)</button>
                     </div>
                 </div>
@@ -219,6 +221,7 @@
                 <div class="split-screen">
                     <h1>บ้านสวน</h1>
                     
+                    <!-- ส่วนพยากรณ์อากาศแบบ Real-time (บ้านสวน) -->
                     <div class="card" style="background: linear-gradient(135deg, #134e5e, #71b280); color: white; border: none; padding: 20px;">
                         <h3 style="color: white; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; display: flex; justify-content: space-between;">
                             <span>📍 สภาพอากาศวันนี้</span>
@@ -266,7 +269,7 @@
                         <div class="chart-container mini-chart"><canvas id="chart-yearly-wa-garden"></canvas></div>
                     </div>
 
-                    <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ (หน้า 1) -->
+                    <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ -->
                     <div class="card" style="border: 2px solid #ff9800; background: #fffdf5;">
                         <div class="card-header" style="border-bottom-color: #ffcc80;">
                             <h3 style="display:block; color: #e65100;">⚠️ บันทึกเหตุการณ์ผิดปกติ</h3>
@@ -291,6 +294,7 @@
                             <button onclick="window.addTodo('garden')">เพิ่มรายการ</button>
                         </div>
                         <ul id="list-todo-garden" class="todo-list"></ul>
+                        <!-- ปุ่มดาวน์โหลด ICS รวม -->
                         <button class="full-width-btn" style="margin-top: 15px; background-color: #ffc107; color: #333;" onclick="window.downloadICS('garden')">🗓️ โหลดข้อมูลทั้งหมดลงปฏิทิน (.ics)</button>
                     </div>
                 </div>
@@ -1167,8 +1171,9 @@
         };
 
         async function initWeather() {
-            const latHome = 13.7563, lonHome = 100.5018; 
-            const latGarden = 13.7563, lonGarden = 100.5018; 
+            // 🔥 ฝังพิกัด GPS จริงตามที่ได้รับมอบหมาย
+            const latHome = 13.7377070, lonHome = 100.7055940; 
+            const latGarden = 12.701087, lonGarden = 99.758850; 
 
             const fetchW = async (loc, lat, lon) => {
                 try {
