@@ -138,6 +138,27 @@
                 <!-- ฝั่งบ้าน -->
                 <div class="split-screen">
                     <h1>บ้าน</h1>
+                    
+                    <div class="card" style="background: linear-gradient(135deg, #3a7bd5, #3a6073); color: white; border: none; padding: 20px;">
+                        <h3 style="color: white; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; display: flex; justify-content: space-between;">
+                            <span>📍 สภาพอากาศวันนี้</span>
+                            <span style="font-size: 0.75em; font-weight: normal; opacity: 0.8; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 10px;">อัปเดตอัตโนมัติ</span>
+                        </h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 0 10px;">
+                            <div style="text-align: center;">
+                                <div id="weather-icon-home" style="font-size: 4.5em; line-height: 1;">--</div>
+                                <div id="weather-desc-home" style="font-size: 0.95em; margin-top: 8px; opacity: 0.9; font-weight: bold;">กำลังโหลด...</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 3.5em; font-weight: bold; line-height: 1;"><span id="temp-current-home">--</span><span style="font-size: 0.4em; vertical-align: super; opacity: 0.8;">°C</span></div>
+                                <div style="font-size: 0.90em; margin-top: 10px; background: rgba(0,0,0,0.25); padding: 8px 14px; border-radius: 15px; letter-spacing: 0.5px; line-height: 1.5;">
+                                    🔺 สูงสุด <span id="temp-max-home">--</span>° <span id="time-max-home" style="opacity:0.8; font-size:0.85em;"></span><br>
+                                    🔻 ต่ำสุด <span id="temp-min-home">--</span>° <span id="time-min-home" style="opacity:0.8; font-size:0.85em;"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="card" style="background: #f0f8ff; border-color: #cce5ff;">
                         <h3 style="display:block; text-align: center; color: #004085; margin-bottom: 20px;">📊 สรุปข้อมูลเฉลี่ยประจำเดือน</h3>
                         <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 20px; text-align: center; gap: 10px;">
@@ -164,9 +185,24 @@
                         <h4 style="margin: 15px 0 5px 0; color: #0056b3;">💦 ปริมาณน้ำใช้สะสมรายเดือน (ตลอดปี)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-yearly-wa-home"></canvas></div>
                     </div>
+
+                    <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ (หน้า 1) -->
+                    <div class="card" style="border: 2px solid #ff9800; background: #fffdf5;">
+                        <div class="card-header" style="border-bottom-color: #ffcc80;">
+                            <h3 style="display:block; color: #e65100;">⚠️ บันทึกเหตุการณ์ผิดปกติ</h3>
+                            <button class="toggle-btn" style="background: #ffe0b2; color: #e65100;" onclick="window.toggleForm('form-incident-home')">+</button>
+                        </div>
+                        <div id="form-incident-home" class="add-form" style="background: white; border: 1px solid #ffcc80;">
+                            <input type="text" id="incident-text-home" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, แมลงระบาด)">
+                            <input type="datetime-local" id="incident-date-home">
+                            <button style="background-color: #f57c00;" onclick="window.addIncident('home')">บันทึกเหตุการณ์</button>
+                        </div>
+                        <ul id="list-incident-home" class="todo-list"></ul>
+                    </div>
+
                     <div class="card">
                         <div class="card-header">
-                            <h3 style="display:block;">รายการที่ต้องทำ</h3>
+                            <h3 style="display:block;">📋 รายการที่ต้องทำ</h3>
                             <button class="toggle-btn" onclick="window.toggleForm('form-todo-home')">+</button>
                         </div>
                         <div id="form-todo-home" class="add-form">
@@ -175,7 +211,6 @@
                             <button onclick="window.addTodo('home')">เพิ่มรายการ</button>
                         </div>
                         <ul id="list-todo-home" class="todo-list"></ul>
-                        <!-- ปุ่มดาวน์โหลด ICS รวม -->
                         <button class="full-width-btn" style="margin-top: 15px; background-color: #ffc107; color: #333;" onclick="window.downloadICS('home')">🗓️ โหลดข้อมูลทั้งหมดลงปฏิทิน (.ics)</button>
                     </div>
                 </div>
@@ -183,6 +218,27 @@
                 <!-- ฝั่งบ้านสวน -->
                 <div class="split-screen">
                     <h1>บ้านสวน</h1>
+                    
+                    <div class="card" style="background: linear-gradient(135deg, #134e5e, #71b280); color: white; border: none; padding: 20px;">
+                        <h3 style="color: white; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; display: flex; justify-content: space-between;">
+                            <span>📍 สภาพอากาศวันนี้</span>
+                            <span style="font-size: 0.75em; font-weight: normal; opacity: 0.8; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 10px;">อัปเดตอัตโนมัติ</span>
+                        </h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 0 10px;">
+                            <div style="text-align: center;">
+                                <div id="weather-icon-garden" style="font-size: 4.5em; line-height: 1;">--</div>
+                                <div id="weather-desc-garden" style="font-size: 0.95em; margin-top: 8px; opacity: 0.9; font-weight: bold;">กำลังโหลด...</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 3.5em; font-weight: bold; line-height: 1;"><span id="temp-current-garden">--</span><span style="font-size: 0.4em; vertical-align: super; opacity: 0.8;">°C</span></div>
+                                <div style="font-size: 0.90em; margin-top: 10px; background: rgba(0,0,0,0.25); padding: 8px 14px; border-radius: 15px; letter-spacing: 0.5px; line-height: 1.5;">
+                                    🔺 สูงสุด <span id="temp-max-garden">--</span>° <span id="time-max-garden" style="opacity:0.8; font-size:0.85em;"></span><br>
+                                    🔻 ต่ำสุด <span id="temp-min-garden">--</span>° <span id="time-min-garden" style="opacity:0.8; font-size:0.85em;"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="card" style="background: #f4fcf5; border-color: #c3e6cb;">
                         <h3 style="display:block; text-align: center; color: #155724; margin-bottom: 20px;">📊 สรุปข้อมูลเฉลี่ยประจำเดือน</h3>
                         <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 20px; text-align: center; gap: 10px;">
@@ -209,9 +265,24 @@
                         <h4 style="margin: 15px 0 5px 0; color: #28a745;">💦 ปริมาณน้ำใช้สะสมรายเดือน (ตลอดปี)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-yearly-wa-garden"></canvas></div>
                     </div>
+
+                    <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ (หน้า 1) -->
+                    <div class="card" style="border: 2px solid #ff9800; background: #fffdf5;">
+                        <div class="card-header" style="border-bottom-color: #ffcc80;">
+                            <h3 style="display:block; color: #e65100;">⚠️ บันทึกเหตุการณ์ผิดปกติ</h3>
+                            <button class="toggle-btn" style="background: #ffe0b2; color: #e65100;" onclick="window.toggleForm('form-incident-garden')">+</button>
+                        </div>
+                        <div id="form-incident-garden" class="add-form" style="background: white; border: 1px solid #ffcc80;">
+                            <input type="text" id="incident-text-garden" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, แมลงระบาด)">
+                            <input type="datetime-local" id="incident-date-garden">
+                            <button style="background-color: #f57c00;" onclick="window.addIncident('garden')">บันทึกเหตุการณ์</button>
+                        </div>
+                        <ul id="list-incident-garden" class="todo-list"></ul>
+                    </div>
+
                     <div class="card">
                         <div class="card-header">
-                            <h3 style="display:block;">รายการที่ต้องทำ</h3>
+                            <h3 style="display:block;">📋 รายการที่ต้องทำ</h3>
                             <button class="toggle-btn" onclick="window.toggleForm('form-todo-garden')">+</button>
                         </div>
                         <div id="form-todo-garden" class="add-form">
@@ -220,7 +291,6 @@
                             <button onclick="window.addTodo('garden')">เพิ่มรายการ</button>
                         </div>
                         <ul id="list-todo-garden" class="todo-list"></ul>
-                        <!-- ปุ่มดาวน์โหลด ICS รวม -->
                         <button class="full-width-btn" style="margin-top: 15px; background-color: #ffc107; color: #333;" onclick="window.downloadICS('garden')">🗓️ โหลดข้อมูลทั้งหมดลงปฏิทิน (.ics)</button>
                     </div>
                 </div>
@@ -246,6 +316,21 @@
                             <input type="file" multiple accept=".xlsx, .xls" onchange="window.handleMultipleFileUpload(event, 'home')">
                         </div>
                     </div>
+
+                    <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ (หน้า 2 - ซิงค์กับหน้า 1) -->
+                    <div class="card" style="border: 2px solid #ff9800; background: #fffdf5;">
+                        <div class="card-header" style="border-bottom-color: #ffcc80;">
+                            <h3 style="display:block; color: #e65100;">⚠️ บันทึกเหตุการณ์ผิดปกติ</h3>
+                            <button class="toggle-btn" style="background: #ffe0b2; color: #e65100;" onclick="window.toggleForm('form-incident-home-p2')">+</button>
+                        </div>
+                        <div id="form-incident-home-p2" class="add-form" style="background: white; border: 1px solid #ffcc80;">
+                            <input type="text" id="incident-text-home-p2" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, แมลงระบาด)">
+                            <input type="datetime-local" id="incident-date-home-p2">
+                            <button style="background-color: #f57c00;" onclick="window.addIncident('home', 'p2')">บันทึกเหตุการณ์</button>
+                        </div>
+                        <ul id="list-incident-home-p2" class="todo-list"></ul>
+                    </div>
+
                     <div class="card" id="card-wa-home">
                         <h3>
                             <span>🪣 ปริมาณน้ำ (L) 
@@ -291,6 +376,21 @@
                             <input type="file" multiple accept=".xlsx, .xls" onchange="window.handleMultipleFileUpload(event, 'garden')">
                         </div>
                     </div>
+
+                    <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ (หน้า 2 - ซิงค์กับหน้า 1) -->
+                    <div class="card" style="border: 2px solid #ff9800; background: #fffdf5;">
+                        <div class="card-header" style="border-bottom-color: #ffcc80;">
+                            <h3 style="display:block; color: #e65100;">⚠️ บันทึกเหตุการณ์ผิดปกติ</h3>
+                            <button class="toggle-btn" style="background: #ffe0b2; color: #e65100;" onclick="window.toggleForm('form-incident-garden-p2')">+</button>
+                        </div>
+                        <div id="form-incident-garden-p2" class="add-form" style="background: white; border: 1px solid #ffcc80;">
+                            <input type="text" id="incident-text-garden-p2" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, แมลงระบาด)">
+                            <input type="datetime-local" id="incident-date-garden-p2">
+                            <button style="background-color: #f57c00;" onclick="window.addIncident('garden', 'p2')">บันทึกเหตุการณ์</button>
+                        </div>
+                        <ul id="list-incident-garden-p2" class="todo-list"></ul>
+                    </div>
+
                     <div class="card" id="card-wa-garden">
                         <h3>
                             <span>🪣 ปริมาณน้ำ (L) 
@@ -483,7 +583,6 @@
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
                 
-                // 🔥 เปลี่ยนระบบการดึงข้อมูลจาก User ส่วนตัว เป็นโฟลเดอร์ส่วนรวม (Shared Data)
                 onValue(ref(db, 'shared_farm_data'), (snapshot) => {
                     cloudData = snapshot.val() || {};
                     window.refreshAllUI();
@@ -497,13 +596,12 @@
         });
 
         function getStorage(key, isArray = true) { return cloudData[key] !== undefined ? cloudData[key] : (isArray ? [] : null); }
-        
-        // 🔥 เปลี่ยนระบบเซฟข้อมูล ให้บันทึกลงโฟลเดอร์ส่วนรวม (ทุกคนเห็นตรงกัน)
         function saveStorage(key, data) { if(myUid) set(ref(db, `shared_farm_data/${key}`), data); }
         function deleteStorage(key) { if(myUid) remove(ref(db, `shared_farm_data/${key}`)); }
 
         window.refreshAllUI = () => {
             renderTodos('home'); renderTodos('garden');
+            renderIncidents('home'); renderIncidents('garden');
             window.renderIndividualTrees('home'); window.renderIndividualTrees('garden');
             window.loadSavedSensorData();
             window.updatePage1Averages('home');
@@ -569,6 +667,7 @@
             updateChart(myCharts[`avg-st-${loc}`], 'อุณหภูมิเฉลี่ย (°C)', hours24, calcHourlyProfile(filterByMonth(stData?.records, currentMonth)), '#ff6384');
         };
 
+        // ================= To-Do System =================
         function renderTodos(loc) {
             const list = document.getElementById(`list-todo-${loc}`); 
             const todos = getStorage(`todos_${loc}`, true); 
@@ -653,7 +752,74 @@
             renderTodos(loc); 
         };
 
-        // ฟังก์ชันสร้างไฟล์ .ics สำหรับกวาดรายการทั้งหมดลงปฏิทิน
+        // ================= Incident System (ซิงค์ระหว่างหน้า 1 และ 2) =================
+        function renderIncidents(loc) {
+            const incidents = getStorage(`incidents_${loc}`, true); 
+            const listP1 = document.getElementById(`list-incident-${loc}`); 
+            const listP2 = document.getElementById(`list-incident-${loc}-p2`); 
+
+            const buildList = (container) => {
+                if(!container) return;
+                container.innerHTML = '';
+                incidents.forEach((inc, idx) => {
+                    const li = document.createElement('li'); 
+                    li.style.borderBottomColor = '#ffe0b2';
+                    
+                    const sp = document.createElement('span'); 
+                    sp.className = 'task-text'; 
+                    sp.innerText = inc.text;
+                    li.appendChild(sp);
+
+                    if(inc.date) {
+                        const dateObj = new Date(inc.date);
+                        const dateSpan = document.createElement('span');
+                        dateSpan.className = 'due-date';
+                        dateSpan.style.backgroundColor = '#ffe0b2';
+                        dateSpan.style.color = '#e65100';
+                        dateSpan.innerHTML = `🕒 ${dateObj.toLocaleDateString('th-TH')} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
+                        li.appendChild(dateSpan);
+                    }
+
+                    const del = document.createElement('button'); 
+                    del.className = 'delete-btn'; 
+                    del.innerHTML = '✖';
+                    del.style.background = 'none';
+                    del.style.border = 'none';
+                    del.style.cursor = 'pointer';
+                    del.style.color = '#e65100';
+                    del.style.fontWeight = 'bold';
+                    del.style.marginLeft = '10px';
+                    del.onclick = () => { 
+                        incidents.splice(idx, 1); 
+                        saveStorage(`incidents_${loc}`, incidents); 
+                        renderIncidents(loc); 
+                    };
+                    li.appendChild(del); 
+                    container.appendChild(li);
+                });
+            };
+
+            buildList(listP1);
+            buildList(listP2);
+        }
+
+        window.addIncident = (loc, pageSuffix = '') => {
+            const suffix = pageSuffix ? `-${pageSuffix}` : '';
+            const txtEl = document.getElementById(`incident-text-${loc}${suffix}`);
+            const dtEl = document.getElementById(`incident-date-${loc}${suffix}`);
+            
+            if(!txtEl || !txtEl.value.trim()) return;
+            
+            const incidents = getStorage(`incidents_${loc}`, true); 
+            incidents.push({text: txtEl.value, date: dtEl.value}); 
+            saveStorage(`incidents_${loc}`, incidents);
+            
+            txtEl.value = ''; 
+            dtEl.value = '';
+            
+            renderIncidents(loc); 
+        };
+
         window.downloadICS = (loc) => {
             const todos = getStorage(`todos_${loc}`, true);
             const tasksWithDate = todos.filter(t => t.date && !t.completed);
@@ -968,7 +1134,89 @@
         window.openFullscreen = (chartId, title) => { const modal = document.getElementById('chart-modal'); const canvas = document.getElementById(`chart-${chartId}`); document.getElementById('modal-title').innerText = title; currentFullscreenChartId = chartId; document.getElementById('modal-body').appendChild(canvas); modal.style.display = 'flex'; myCharts[chartId].resize(); };
         window.closeFullscreen = (event, forceClose = false) => { const modal = document.getElementById('chart-modal'); if (forceClose || (event && event.target === modal)) { if (currentFullscreenChartId) { const originalContainer = document.getElementById(`container-${currentFullscreenChartId}`); const canvas = document.getElementById(`chart-${currentFullscreenChartId}`); originalContainer.appendChild(canvas); modal.style.display = 'none'; myCharts[currentFullscreenChartId].resize(); currentFullscreenChartId = null; } } };
 
-        document.addEventListener('DOMContentLoaded', () => { initCharts(); });
+        const getWeatherIcon = (code) => {
+            if (code === 0) return '☀️';
+            if (code === 1 || code === 2) return '⛅';
+            if (code === 3) return '☁️';
+            if (code >= 45 && code <= 48) return '🌫️';
+            if (code >= 51 && code <= 55) return '🌧️';
+            if (code >= 61 && code <= 67) return '🌧️';
+            if (code >= 71 && code <= 77) return '❄️';
+            if (code >= 80 && code <= 82) return '🌦️';
+            if (code >= 95 && code <= 99) return '⛈️';
+            return '🌤️';
+        };
+        
+        const getWeatherDesc = (code) => {
+            if (code === 0) return 'ท้องฟ้าแจ่มใส';
+            if (code === 1 || code === 2) return 'มีเมฆบางส่วน';
+            if (code === 3) return 'มืดครึ้ม';
+            if (code >= 45 && code <= 48) return 'มีหมอก';
+            if (code >= 51 && code <= 55) return 'ฝนตกปรอยๆ';
+            if (code >= 61 && code <= 67) return 'ฝนตก';
+            if (code >= 71 && code <= 77) return 'หิมะตก';
+            if (code >= 80 && code <= 82) return 'ฝนตกหนัก';
+            if (code >= 95 && code <= 99) return 'พายุฝนฟ้าคะนอง';
+            return 'ปกติ';
+        };
+
+        const formatTimeFromIso = (isoString) => {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            return `(${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')})`;
+        };
+
+        async function initWeather() {
+            const latHome = 13.7563, lonHome = 100.5018; 
+            const latGarden = 13.7563, lonGarden = 100.5018; 
+
+            const fetchW = async (loc, lat, lon) => {
+                try {
+                    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&hourly=temperature_2m&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FBangkok`);
+                    const data = await res.json();
+                    
+                    document.getElementById(`temp-current-${loc}`).innerText = Math.round(data.current.temperature_2m);
+                    document.getElementById(`weather-icon-${loc}`).innerText = getWeatherIcon(data.current.weather_code);
+                    document.getElementById(`weather-desc-${loc}`).innerText = getWeatherDesc(data.current.weather_code);
+                    
+                    const maxTemp = data.daily.temperature_2m_max[0];
+                    const minTemp = data.daily.temperature_2m_min[0];
+                    document.getElementById(`temp-max-${loc}`).innerText = Math.round(maxTemp);
+                    document.getElementById(`temp-min-${loc}`).innerText = Math.round(minTemp);
+
+                    let maxTimeIndex = 0;
+                    let minTimeIndex = 0;
+                    let currentMax = -999;
+                    let currentMin = 999;
+
+                    for(let i=0; i<24; i++) {
+                        if(data.hourly.temperature_2m[i] > currentMax) {
+                            currentMax = data.hourly.temperature_2m[i];
+                            maxTimeIndex = i;
+                        }
+                        if(data.hourly.temperature_2m[i] < currentMin) {
+                            currentMin = data.hourly.temperature_2m[i];
+                            minTimeIndex = i;
+                        }
+                    }
+
+                    document.getElementById(`time-max-${loc}`).innerText = formatTimeFromIso(data.hourly.time[maxTimeIndex]);
+                    document.getElementById(`time-min-${loc}`).innerText = formatTimeFromIso(data.hourly.time[minTimeIndex]);
+
+                } catch(e) { 
+                    console.error('Weather error:', e); 
+                    document.getElementById(`weather-desc-${loc}`).innerText = 'ไม่สามารถดึงข้อมูลได้';
+                }
+            };
+
+            fetchW('home', latHome, lonHome);
+            fetchW('garden', latGarden, lonGarden);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { 
+            initCharts(); 
+            initWeather(); 
+        });
     </script>
 </body>
 </html>
