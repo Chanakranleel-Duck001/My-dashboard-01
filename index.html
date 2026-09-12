@@ -139,7 +139,6 @@
                 <div class="split-screen">
                     <h1>บ้าน</h1>
                     
-                    <!-- ส่วนพยากรณ์อากาศแบบ Real-time (บ้าน) -->
                     <div class="card" style="background: linear-gradient(135deg, #3a7bd5, #3a6073); color: white; border: none; padding: 20px;">
                         <h3 style="color: white; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; display: flex; justify-content: space-between;">
                             <span>📍 สภาพอากาศวันนี้</span>
@@ -221,7 +220,6 @@
                 <div class="split-screen">
                     <h1>บ้านสวน</h1>
                     
-                    <!-- ส่วนพยากรณ์อากาศแบบ Real-time (บ้านสวน) -->
                     <div class="card" style="background: linear-gradient(135deg, #134e5e, #71b280); color: white; border: none; padding: 20px;">
                         <h3 style="color: white; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; display: flex; justify-content: space-between;">
                             <span>📍 สภาพอากาศวันนี้</span>
@@ -756,7 +754,7 @@
             renderTodos(loc); 
         };
 
-        // ================= Incident System (ซิงค์ระหว่างหน้า 1 และ 2) =================
+        // ================= Incident System =================
         function renderIncidents(loc) {
             const incidents = getStorage(`incidents_${loc}`, true); 
             const listP1 = document.getElementById(`list-incident-${loc}`); 
@@ -1070,18 +1068,27 @@
         };
 
         window.handleMultipleFileUpload = (event, loc) => {
-            const files = event.target.files; if(files.length === 0) return;
+            const files = event.target.files; 
+            if(files.length === 0) return;
+            
             const selectedMode = document.getElementById(`data-type-${loc}`).value; 
-            const uploadWaterZone = document.getElementById(`upload-water-zone-${loc}`).value;
+            
+            // ป้องกัน Error กรณีหาช่องเลือกโซนน้ำไม่เจอ
+            const waterZoneEl = document.getElementById(`upload-water-zone-${loc}`);
+            const uploadWaterZone = waterZoneEl ? waterZoneEl.value : '1';
+
             Array.from(files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     try {
-                        const data = e.target.result; const workbook = XLSX.read(data, {type: 'binary', cellDates: true});
+                        const data = e.target.result; 
+                        const workbook = XLSX.read(data, {type: 'binary', cellDates: true});
                         const excelData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1, raw: false});
                         let targetType = '';
-                        if (selectedMode === 'tree_count') targetType = 'tree_count';
-                        else {
+                        
+                        if (selectedMode === 'tree_count') {
+                            targetType = 'tree_count';
+                        } else {
                             let sampleVal = "";
                             for(let i = 0; i < Math.min(20, excelData.length); i++) {
                                 if(excelData[i] && excelData[i][1] != null) { 
@@ -1089,13 +1096,26 @@
                                     if(val !== "VALUE" && val.trim() !== "") { sampleVal = val; break; }
                                 }
                             }
-                            if(sampleVal.includes('LX')) targetType = 'light_intensity'; else if(sampleVal.includes('MM')) targetType = 'rainfall';
-                            else if(sampleVal.includes('%') || sampleVal.includes('RH')) targetType = 'soil_moisture'; else if(sampleVal.includes('C') || sampleVal.includes('℃')) targetType = 'soil_temp';
+                            if(sampleVal.includes('LX')) targetType = 'light_intensity'; 
+                            else if(sampleVal.includes('MM')) targetType = 'rainfall';
+                            else if(sampleVal.includes('%') || sampleVal.includes('RH')) targetType = 'soil_moisture'; 
+                            else if(sampleVal.includes('C') || sampleVal.includes('℃')) targetType = 'soil_temp';
                             else if(sampleVal.includes('L')) targetType = `water_acc_${uploadWaterZone}`;
                         }
-                        if(targetType) processData(excelData, loc, targetType); 
-                        else console.warn("ไม่สามารถระบุชนิดข้อมูลได้จากไฟล์:", file.name);
-                    } catch(error) { console.error("ไฟล์ขัดข้อง: ", error); }
+                        
+                        if(targetType) {
+                            processData(excelData, loc, targetType); 
+                            // บังคับให้อัปเดตกราฟทันทีโดยไม่ต้องรอ F5
+                            setTimeout(() => {
+                                window.loadSavedSensorData();
+                                window.updatePage1Averages(loc);
+                            }, 300);
+                        } else {
+                            alert(`⚠️ อ่านไฟล์ "${file.name}" ไม่สำเร็จ!\nไม่พบสัญลักษณ์หน่วย (C, %, MM, LX) ในคอลัมน์ที่ 2 ระบบจึงไม่รู้ว่าเป็นเซ็นเซอร์ชนิดไหนครับ`);
+                        }
+                    } catch(error) { 
+                        alert("เกิดข้อผิดพลาดในการอ่านไฟล์: " + error.message); 
+                    }
                 };
                 reader.readAsBinaryString(file);
             });
