@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Dashboard (Advanced Analytics)</title>
+    <!-- เพิ่มลงหน้าจอโฮมของมือถือได้ เปิดแล้วเหมือนแอป -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="ฟาร์ม">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- ล็อกเวอร์ชัน Chart.js ไว้ ป้องกันกราฟพังเมื่อมีเวอร์ชันใหม่ -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; color: #333; }
+
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1ae6; z-index: 10000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .login-box { background: white; padding: 40px; border-radius: 16px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .login-box h2 { margin-top: 0; color: #333; font-size: 1.8em; margin-bottom: 25px; }
+        .login-box input { width: 100%; padding: 12px 15px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1em; }
+        .login-box button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .login-box button:hover { background: #218838; }
+        #login-error { color: #dc3545; margin-top: 15px; display: none; font-weight: bold; font-size: 0.9em; }
+
+        #notification-banner { display: none; background-color: #dc3545; color: white; padding: 12px 20px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 101; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .close-alert-btn { margin-left: 15px; background: white; color: #dc3545; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+
+        .top-nav { background: #1a1a1a; padding: 15px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 100; flex-wrap: wrap;}
+        .tab-btn { background: #333; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-size: 1.05em; cursor: pointer; transition: 0.3s; white-space: nowrap;}
+        .tab-btn.active { background: #28a745; font-weight: bold; }
+        .tab-btn:hover { background: #444; }
+
+        .month-picker-container { display: flex; align-items: center; gap: 8px; background: #444; padding: 5px 15px; border-radius: 8px; color: white; margin-left: auto; font-weight: bold;}
+        .month-picker-container input { padding: 5px; border-radius: 5px; border: none; font-family: inherit; }
+
+        .logout-btn { background: #dc3545; }
+        .logout-btn:hover { background: #c82333; }
+
+        .page-content { display: none; }
+        .page-content.active { display: block; }
+
+        .management-container { display: flex; min-height: 90vh; }
+        .split-screen { flex: 1; padding: 40px 20px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; overflow-y: auto; }
+        .split-screen:first-child { border-right: 2px solid #e0e0e0; background-color: #ffffff; }
+        .split-screen:last-child { background-color: #f8fafc; }
+        h1 { color: #1a1a1a; margin-bottom: 5px; font-size: 2.5em; text-align: center;}
+
+        .card { background: white; width: 100%; max-width: 500px; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid #f0f0f0; box-sizing: border-box; position: relative;}
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f2f5; padding-bottom: 12px; margin-bottom: 15px;}
+        .card h3 { margin: 0; color: #4a4a4a; font-size: 1.2em; display: flex; align-items: center; justify-content: space-between; width: 100%;}
+
+        .todo-list, .expense-list { list-style-type: none; padding: 0; margin: 0; }
+        .todo-list li, .expense-list li { padding: 12px 0; border-bottom: 1px dashed #e0e0e0; display: flex; align-items: center; flex-wrap: wrap;}
+        .todo-list input[type="checkbox"] { margin-right: 12px; transform: scale(1.2); cursor: pointer; }
+        .task-text { flex: 1; }
+        .completed span.task-text { text-decoration: line-through; color: #999; }
+
+        .due-date { font-size: 0.85em; background: #e9ecef; padding: 2px 8px; border-radius: 10px; margin-left: 10px; display: inline-flex; align-items: center; gap: 5px;}
+        .add-form { display: none; margin-bottom: 15px; flex-direction: column; gap: 8px; background: #f8fafc; padding: 10px; border-radius: 8px;}
+        .add-form input, .add-form select { padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit;}
+        .add-form button { padding: 8px; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight:bold;}
+        .toggle-btn { background: #e6f2ff; color: #0056b3; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 1.2em; cursor: pointer;}
+
+        .stat-card { text-align: center; border-bottom: 4px solid #28a745; background: #f8fff9;}
+        .stat-card.garden { border-bottom-color: #0056b3; background: #f4f9ff;}
+        .stat-card .number { font-size: 3em; font-weight: bold; color: #28a745; margin: 10px 0 0 0;}
+        .stat-card.garden .number { color: #0056b3; }
+
+        .upload-row { display: flex; gap: 10px; margin-bottom: 10px;}
+        .upload-row select { flex: 1; }
+        .upload-row input[type="file"] { flex: 2; padding: 5px; }
+
+        .chart-container { position: relative; height: 240px; width: 100%; margin-top: 15px; }
+        .mini-chart { height: 140px; margin-bottom: 20px;}
+
+        .action-btns { display: flex; gap: 5px;}
+        .clear-chart-btn { font-size: 0.8em; background: #ffebee; color: #d32f2f; border: 1px solid #ef9a9a; border-radius: 4px; padding: 3px 8px; cursor: pointer;}
+        .fullscreen-btn { font-size: 0.8em; background: #e3f2fd; color: #1976d2; border: 1px solid #bbdefb; border-radius: 4px; padding: 3px 8px; cursor: pointer;}
+
+        .tree-page-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .tree-form-container { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .form-section { border: 1px solid #eef0f2; padding: 15px 20px; border-radius: 12px; margin-bottom: 15px; background: #f8fafc;}
+        .form-section.upload-section { background: #e9ecef; border-color: #ced4da; }
+        .form-section h4 { margin-top: 0; margin-bottom: 15px; color: #333; font-size: 1.1em; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px;}
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .input-grid input, .input-grid select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: inherit; font-size: 1em; width: 100%; box-sizing: border-box;}
+        .full-width-btn { padding: 12px 20px; background-color: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1em; width: 100%; transition: 0.3s;}
+
+        .search-box { width: 100%; padding: 15px; border-radius: 10px; border: 2px solid #e0e0e0; font-size: 1.1em; margin-bottom: 25px; box-sizing: border-box; transition: 0.3s; }
+        .search-box:focus { outline: none; border-color: #28a745; box-shadow: 0 0 8px rgba(40,167,69,0.2); }
+
+        .tree-grid { display: flex; flex-wrap: wrap; gap: 20px; }
+        .tree-card { flex: 1 1 300px; max-width: 100%; background: white; border-radius: 16px; padding: 20px; border: 1px solid #e0e0e0; position: relative; border-left: 5px solid #28a745;}
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; height: 80%; position: relative; display: flex; flex-direction: column; }
+        .modal-content h3 { margin-top: 0; color: #333; text-align: center;}
+        .modal-body { flex: 1; position: relative; }
+        .close-modal-btn { position: absolute; top: 10px; right: 15px; font-size: 1.5em; cursor: pointer; color: #888; background: none; border: none; }
+
+        .no-data { color: #999 !important; font-size: 0.6em !important; }
+        .stat-note { font-size: 0.8em; color: #777; margin: 4px 0 0 0; }
+        .upload-msg { font-size: 0.9em; margin-top: 8px; line-height: 1.5; }
+        .upload-msg .ok { color: #28a745; } .upload-msg .err { color: #d32f2f; }
+        .zone-row { display: flex; align-items: center; gap: 8px; font-size: 0.9em; color: #555; margin-bottom: 8px; flex-wrap: wrap; }
+        .zone-row select { padding: 4px 6px; border-radius: 6px; border: 1px solid #9966ff; }
+        .backup-btn { font-size: 0.9em; background: #f1f3f5; color: #333; border: 1px solid #ced4da; border-radius: 6px; padding: 6px 12px; cursor: pointer; margin-top: 8px; }
+        .status-badge { padding: 2px 10px; border-radius: 10px; font-size: 0.9em; background: #e9ecef; }
+        .status-ดีเยี่ยม { background: #d4edda; color: #155724; }
+        .status-ปกติ { background: #fff3cd; color: #856404; }
+        .status-ออกดอก { background: #f1f3f5; color: #495057; }
+        .status-ต้องดูแล { background: #f8d7da; color: #721c24; }
+        /* ปุ่มสลับ บ้าน | บ้านสวน (แสดงเฉพาะบนมือถือ) */
+        .site-switch { display: none; background: #333; border-radius: 8px; padding: 3px; gap: 3px; }
+        .site-switch button { background: none; color: #ccc; border: none; padding: 7px 14px; border-radius: 6px; font-size: 1em; font-weight: bold; cursor: pointer; white-space: nowrap; font-family: inherit; }
+        .site-switch button.on { background: #28a745; color: white; }
+        .site-switch button.on[data-site="garden"] { background: #0056b3; }
+
+        /* การ์ดเปรียบเทียบ */
+        .compare-table { width: 100%; border-collapse: collapse; font-size: 0.92em; }
+        .compare-table th, .compare-table td { padding: 8px 6px; border-bottom: 1px solid #eee; text-align: right; white-space: nowrap; }
+        .compare-table th:first-child, .compare-table td:first-child { text-align: left; white-space: normal; }
+        .compare-table th { font-size: 0.85em; color: #777; font-weight: 600; }
+        .compare-table td.now { font-weight: bold; color: #222; }
+        .chg { display: block; font-size: 0.8em; font-weight: normal; color: #777; }
+        .chg.up::before { content: '▲ '; } .chg.down::before { content: '▼ '; }
+        .compare-note { font-size: 0.8em; color: #888; margin: 10px 0 0 0; }
+        .compare-scroll { overflow-x: auto; }
+
+        @media (max-width: 768px) {
+            .management-container { flex-direction: column; }
+            /* แถบเมนูเลื่อนซ้าย-ขวาได้ ไม่กินพื้นที่จอ */
+            .top-nav { flex-wrap: nowrap; overflow-x: auto; padding: 8px; gap: 6px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+            .top-nav::-webkit-scrollbar { display: none; }
+            .tab-btn { padding: 8px 12px; font-size: 0.95em; }
+            .month-picker-container { margin: 0; padding: 4px 10px; white-space: nowrap; }
+            .site-switch { display: flex; flex-shrink: 0; order: -2; }
+            .month-picker-container { order: -1; }
+            /* แสดงทีละพื้นที่ */
+            body.show-home .management-container > .split-screen:nth-child(2),
+            body.show-garden .management-container > .split-screen:nth-child(1) { display: none; }
+            .split-screen { padding: 16px 12px; border-right: none !important; }
+            h1 { font-size: 1.9em; margin-top: 0; }
+            .card { padding: 16px; margin-bottom: 16px; border-radius: 12px; }
+            .tree-page-container { padding: 12px; }
+            .tree-form-container { padding: 16px; }
+            .upload-row { flex-direction: column; }
+            .modal-content { width: 96%; height: 70%; padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= หน้าล็อกอิน ================= -->
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2>🔒 Smart Dashboard</h2>
+            <p style="color:#666; margin-bottom:20px;">กรุณาเข้าสู่ระบบเพื่อเข้าถึงข้อมูลฟาร์ม</p>
+            <input type="email" id="login-email" placeholder="กรอกอีเมล">
+            <input type="password" id="login-pass" placeholder="กรอกรหัสผ่าน">
+            <button onclick="window.handleLogin()">เข้าสู่ระบบ</button>
+            <p id="login-error">อีเมลหรือรหัสผ่านไม่ถูกต้อง!</p>
+        </div>
+    </div>
+
+    <!-- ================= ระบบ Dashboard หลัก ================= -->
+    <div id="main-app" style="display: none;">
+        <div id="notification-banner">
+            ⚠️ แจ้งเตือน: มีรายการที่ต้องทำภายใน 24 ชั่วโมง คือ <span id="urgent-task-list"></span>
+            <button class="close-alert-btn" onclick="this.parentElement.style.display='none'">รับทราบ</button>
+        </div>
+
+        <div class="top-nav">
+            <div class="site-switch" role="group" aria-label="เลือกพื้นที่">
+                <button data-site="home" onclick="window.setSite('home')">บ้าน</button>
+                <button data-site="garden" onclick="window.setSite('garden')">บ้านสวน</button>
+            </div>
+            <button class="tab-btn active" onclick="window.switchTab('page1', this)">📋 หน้าจัดการงาน & สรุปผล</button>
+            <button class="tab-btn" onclick="window.switchTab('page2', this)">🌱 ข้อมูลเซ็นเซอร์ (ละเอียด)</button>
+            <button class="tab-btn" onclick="window.switchTab('page3', this)">🌳 ข้อมูลต้นไม้ (บ้าน)</button>
+            <button class="tab-btn" onclick="window.switchTab('page4', this)">🌲 ข้อมูลต้นไม้ (บ้านสวน)</button>
+
+            <div class="month-picker-container">
+                📅 เลือกเดือน: <input type="month" id="global-month" onchange="window.refreshAllUI()">
+            </div>
+
+            <button class="tab-btn logout-btn" onclick="window.handleLogout()">🚪 ออกจากระบบ</button>
+        </div>
+
+        <!-- หน้าที่ 1 : Management & Averages -->
+        <div id="page1" class="page-content active">
+            <div class="management-container">
+                <!-- ฝั่งบ้าน -->
+                <div class="split-screen">
+                    <h1>บ้าน</h1>
+
+                    <div class="card" style="background: linear-gradient(135deg, #3a7bd5, #3a6073); color: white; border: none; padding: 20px;">
+                        <h3 style="color: white; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; display: flex; justify-content: space-between;">
+                            <span>📍 สภาพอากาศวันนี้</span>
+                            <span style="font-size: 0.75em; font-weight: normal; opacity: 0.8; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 10px;">อัปเดตอัตโนมัติ</span>
+                        </h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 0 10px;">
+                            <div style="text-align: center;">
+                                <div id="weather-icon-home" style="font-size: 4.5em; line-height: 1;">--</div>
+                                <div id="weather-desc-home" style="font-size: 0.95em; margin-top: 8px; opacity: 0.9; font-weight: bold;">กำลังโหลด...</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 3.5em; font-weight: bold; line-height: 1;"><span id="temp-current-home">--</span><span style="font-size: 0.4em; vertical-align: super; opacity: 0.8;">°C</span></div>
+                                <div style="font-size: 0.90em; margin-top: 10px; background: rgba(0,0,0,0.25); padding: 8px 14px; border-radius: 15px; letter-spacing: 0.5px; line-height: 1.5;">
+                                    🔺 สูงสุด <span id="temp-max-home">--</span>° <span id="time-max-home" style="opacity:0.8; font-size:0.85em;"></span><br>
+                                    🔻 ต่ำสุด <span id="temp-min-home">--</span>° <span id="time-min-home" style="opacity:0.8; font-size:0.85em;"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="background: #f0f8ff; border-color: #cce5ff;">
+                        <h3 style="display:block; text-align: center; color: #004085; margin-bottom: 20px;">📊 สรุปข้อมูลเฉลี่ยประจำเดือน</h3>
+                        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 20px; text-align: center; gap: 10px;">
+                            <div style="flex: 1; min-width: 140px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                <p style="font-size: 0.95em; font-weight: bold; margin: 0 0 5px 0; color:#0056b3;">
+                                    💦 เฉลี่ยปริมาณน้ำ
+                                    <select id="avg-water-zone-home" onchange="window.updatePage1Averages('home')" style="padding: 2px; border-radius: 4px; font-size: 0.85em; border: 1px solid #ccc;">
+                                        <option value="1">จุด 1</option><option value="2">จุด 2</option><option value="3">จุด 3</option>
+                                    </select>
+                                </p>
+                                <div style="font-size: 1.8em; color: #0056b3; font-weight: bold;"><span id="avg-wa-val-home">0</span> <span style="font-size:0.4em; color:#666;">L/วัน</span></div>
+                            </div>
+                            <div style="flex: 1; min-width: 140px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                <p style="font-size: 0.95em; font-weight: bold; margin: 0 0 5px 0; color:#17a2b8;">🌧️ น้ำฝนรวมประจำเดือน</p>
+                                <div style="font-size: 1.8em; color: #17a2b8; font-weight: bold;"><span id="sum-rf-val-home">0</span> <span style="font-size:0.4em; color:#666;">mm</span></div>
+                            </div>
+                        </div>
+                        <h4 style="margin: 0 0 5px 0; color: #555;">💧 ความชื้นดิน (เฉลี่ยทุกๆ ชม.)</h4>
+                        <div class="chart-container mini-chart"><canvas id="chart-avg-sm-home"></canvas></div>
+                        <h4 style="margin: 15px 0 5px 0; color: #555;">🌡️ อุณหภูมิดิน (เฉลี่ยทุกๆ ชม.)</h4>
+                        <div class="chart-container mini-chart"><canvas id="chart-avg-st-home"></canvas></div>
+                        <h4 style="margin: 15px 0 5px 0; color: #17a2b8;">🌧️ ปริมาณน้ำฝนสะสมรายเดือน (ตลอดปี)</h4>
+                        <div class="chart-container mini-chart"><canvas id="chart-yearly-rf-home"></canvas></div>
+                        <h4 style="margin: 15px 0 5px 0; color: #0056b3;">💦 ปริมาณน้ำใช้สะสมรายเดือน (ตลอดปี)</h4>
+                        <div class="chart-container mini-chart"><canvas id="chart-yearly-wa-home"></canvas></div>
+                    </div>
+
+                    <!-- 📈 เปรียบเทียบกับเดือนก่อน / ปีที่แล้ว -->
+                    <div class="card">
+                        <h3 style="display:block; margin-bottom: 10px;">📈 เปรียบเทียบ</h3>
+                        <div class="compare-scroll" id="compare-home"></div>
+                        <p class="compare-note">▲ = เดือนที่เลือกมากกว่า · ▼ = น้อยกว่า · น้ำใช้รวมทุกจุด</p>
+                    </div>
+
+                    <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ -->
+                    <div class="card" style="border: 2px solid #ff9800; background: #fffdf5;">
+                        <div class="card-header" style="border-bottom-color: #ffcc80;">
+                            <h3 style="display:block; color: #e65100;">⚠️ บันทึกเหตุการณ์ผิดปกติ</h3>
+                            <button class="toggle-btn" style="background: #ffe0b2; color: #e65100;" onclick="window.toggleForm('form-incident-home')">+</button>
+                        </div>
+                        <div id="form-incident-home" class="add-form" style="background: white; border: 1px solid #ffcc80;">
+                            <input type="text" id="incident-text-home" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, แมลงระบาด)">
+                            <input type="datetime-local" id="incident-date-home">
+                            <button style="background-color: #f57c00;" onclick="window.addIncident('home')">บันทึกเหตุการณ์</button>
+                        </div>
+                        <ul id="list-incident-home" class="todo-list"></ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 style="display:block;">📋 รายการที่ต้องทำ</h3>
+                            <button class="toggle-btn" onclick="window.toggleForm('form-todo-home')">+</button>
+                        </div>
+                        <div id="form-todo-home" class="add-form">
+                            <input type="text" id="todo-text-home" placeholder="พิมพ์รายการใหม่...">
+                            <input type="datetime-local" id="todo-date-home">
+                            <button onclick="window.addTodo('home')">เพิ่มรายการ</button>
+                        </div>
+                        <ul id="list-todo-home" class="todo-list"></ul>
+                        <!-- ปุ่มดาวน์โหลด ICS รวม -->
+                        <button class="full-width-btn" style="margin-top: 15px; background-color: #ffc107; color: #333;" onclick="window.downloadICS('home')">🗓️ โหลดข้อมูลทั้งหมดลงปฏิทิน (.ics)</button>
+                    </div>
+                </div>
+
+                <!-- ฝั่งบ้านสวน -->
+                <div class="split-screen">
+                    <h1>บ้านสวน</h1>
+
+                    <div class="card" style="background: linear-gradient(135deg, #134e5e, #71b280); color: white; border: none; padding: 20px;">
+                        <h3 style="color: white; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; display: flex; justify-content: space-between;">
+                            <span>📍 สภาพอากาศวันนี้</span>
+                            <span style="font-size: 0.75em; font-weight: normal; opacity: 0.8; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 10px;">อัปเดตอัตโนมัติ</span>
+                        </h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 0 10px;">
+                            <div style="text-align: center;">
+                                <div id="weather-icon-garden" style="font-size: 4.5em; line-height: 1;">--</div>
+                                <div id="weather-desc-garden" style="font-size: 0.95em; margin-top: 8px; opacity: 0.9; font-weight: bold;">กำลังโหลด...</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 3.5em; font-weight: bold; line-height: 1;"><span id="temp-current-garden">--</span><span style="font-size: 0.4em; vertical-align: super; opacity: 0.8;">°C</span></div>
+                                <div style="font-size: 0.90em; margin-top: 10px; background: rgba(0,0,0,0.25); padding: 8px 14px; border-radius: 15px; letter-spacing: 0.5px; line-height: 1.5;">
+                                    🔺 สูงสุด <span id="temp-max-garden">--</span>° <span id="time-max-garden" style="opacity:0.8; font-size:0.85em;"></span><br>
+                                    🔻 ต่ำสุด <span id="temp-min-garden">--</span>° <span id="time-min-garden" style="opacity:0.8; font-size:0.85em;"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="background: #f4fcf5; border-color: #c3e6cb;">
+                        <h3 style="display:block; text-align: center; color: #155724; margin-bottom: 20px;">📊 สรุปข้อมูลเฉลี่ยประจำเดือน</h3>
+                        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 20px; text-align: center; gap: 10px;">
+                            <div style="flex: 1; min-width: 140px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                <p style="font-size: 0.95em; font-weight: bold; margin: 0 0 5px 0; color:#28a745;">
+                                    💦 เฉลี่ยปริมาณน้ำ
+                                    <select id="avg-water-zone-garden" onchange="window.updatePage1Averages('garden')" style="padding: 2px; border-radius: 4px; font-size: 0.85em; border: 1px solid #ccc;">
+                                        <option value="1">จุด 1</option><option value="2">จุด 2</option><option value="3">จุด 3</option>
+                                    </select>
+                                </p>
+                                <div style="font-size: 1.8em; color: #28a745; font-weight: bold;"><span id="avg-wa-val-garden">0</span> <span style="font-size:0.4em; color:#666;">L/วัน</span></div>
+                            </div>
+                            <div style="flex: 1; min-width: 140px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                <p style="font-size: 0.95em; font-weight: bold; margin: 0 0 5px 0; color:#17a2b8;">🌧️ น้ำฝนรวมประจำเดือน</p>
+                                <div style="font-size: 1.8em; color: #17a2b8; font-weight: bold;"><span id="sum-rf-val-garden">0</span> <span style="font-size:0.4em; color:#666;">mm</span></div>
+                            </div>
+                        </div>
+                        <h4 style="margin: 0 0 5px 0; color: #555;">💧 ความชื้นดิน (เฉลี่ยทุกๆ ชม.)</h4>
+                        <div class="chart-container mini-chart"><canvas id="chart-avg-sm-garden"></canvas></div>
+                        <h4 style="margin: 15px 0 5px 0; color: #555;">🌡️ อุณหภูมิดิน (เฉลี่ยทุกๆ ชม.)</h4>
+                        <div class="chart-container mini-chart"><canvas id="chart-avg-st-garden"></canvas></div>
+                        <h4 style="margin: 15px 0 5px 0; color: #17a2b8;">🌧️ ปริมาณน้ำฝนสะสมรายเดือน (ตลอดปี)</h4>
+                        <div class="chart-container mini-chart"><canvas id="chart-yearly-rf-garden"></canvas></div>
+                        <h4 style="margin: 15px 0 5px 0; color: #28a745;">💦 ปริมาณน้ำใช้สะสมรายเดือน (ตลอดปี)</h4>
+                        <div class="chart-container mini-chart"><canvas id="chart-yearly-wa-garden"></canvas></div>
+                    </div>
+
+                    <!-- 📈 เปรียบเทียบกับเดือนก่อน / ปีที่แล้ว -->
+                    <div class="card">
+                        <h3 style="display:block; margin-bottom: 10px;">📈 เปรียบเทียบ</h3>
+                        <div class="compare-scroll" id="compare-garden"></div>
+                        <p class="compare-note">▲ = เดือนที่เลือกมากกว่า · ▼ = น้อยกว่า · น้ำใช้รวมทุกจุด</p>
+                    </div>
+
+                    <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ -->
+                    <div class="card" style="border: 2px solid #ff9800; background: #fffdf5;">
+                        <div class="card-header" style="border-bottom-color: #ffcc80;">
+                            <h3 style="display:block; color: #e65100;">⚠️ บันทึกเหตุการณ์ผิดปกติ</h3>
+                            <button class="toggle-btn" style="background: #ffe0b2; color: #e65100;" onclick="window.toggleForm('form-incident-garden')">+</button>
+                        </div>
+                        <div id="form-incident-garden" class="add-form" style="background: white; border: 1px solid #ffcc80;">
+                            <input type="text" id="incident-text-garden" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, แมลงระบาด)">
+                            <input type="datetime-local" id="incident-date-garden">
+                            <button style="background-color: #f57c00;" onclick="window.addIncident('garden')">บันทึกเหตุการณ์</button>
+                        </div>
+                        <ul id="list-incident-garden" class="todo-list"></ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 style="display:block;">📋 รายการที่ต้องทำ</h3>
+                            <button class="toggle-btn" onclick="window.toggleForm('form-todo-garden')">+</button>
+                        </div>
+                        <div id="form-todo-garden" class="add-form">
+                            <input type="text" id="todo-text-garden" placeholder="พิมพ์รายการใหม่...">
+                            <input type="datetime-local" id="todo-date-garden">
+                            <button onclick="window.addTodo('garden')">เพิ่มรายการ</button>
+                        </div>
+                        <ul id="list-todo-garden" class="todo-list"></ul>
+                        <!-- ปุ่มดาวน์โหลด ICS รวม -->
+                        <button class="full-width-btn" style="margin-top: 15px; background-color: #ffc107; color: #333;" onclick="window.downloadICS('garden')">🗓️ โหลดข้อมูลทั้งหมดลงปฏิทิน (.ics)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าที่ 2 : Sensors (ข้อมูลดิบรายวัน) -->
+        <div id="page2" class="page-content">
+            <div class="management-container">
+                <div class="split-screen">
+                    <h1>บ้าน (Sensors)</h1>
+                    <div class="card stat-card">
+                        <h3 style="display: flex;">🌳 ยอดรวมต้นไม้</h3>
+                        <p class="number" id="tree-home">0</p>
+                        <p class="stat-note" id="tree-note-home">นับอัตโนมัติจากชื่อต้นไม้ที่บันทึกไว้</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="display:block; margin-bottom: 10px;">📥 อัปโหลดข้อมูลขึ้น Cloud</h3>
+                        <div class="upload-row">
+                            <select id="data-type-home">
+                                <option value="auto">🤖 แยกข้อมูลอัตโนมัติ (RainPoint)</option>
+                            </select>
+                            <input type="file" multiple accept=".xlsx, .xls, .csv" onchange="window.handleMultipleFileUpload(event, 'home')">
+                        </div>
+                        <div class="zone-row">💦 ถ้าเป็นไฟล์ปริมาณน้ำ บันทึกเป็น
+                            <select id="upload-water-zone-home"><option value="1">จุดที่ 1</option><option value="2">จุดที่ 2</option><option value="3">จุดที่ 3</option></select>
+                        </div>
+                        <div class="upload-msg" id="upload-msg-home"></div>
+                        <button class="backup-btn" onclick="window.downloadBackup()">💾 ดาวน์โหลดสำรองข้อมูลทั้งหมด (.json)</button>
+                    </div>
+
+                    <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ (หน้า 2 - ซิงค์กับหน้า 1) -->
+                    <div class="card" style="border: 2px solid #ff9800; background: #fffdf5;">
+                        <div class="card-header" style="border-bottom-color: #ffcc80;">
+                            <h3 style="display:block; color: #e65100;">⚠️ บันทึกเหตุการณ์ผิดปกติ</h3>
+                            <button class="toggle-btn" style="background: #ffe0b2; color: #e65100;" onclick="window.toggleForm('form-incident-home-p2')">+</button>
+                        </div>
+                        <div id="form-incident-home-p2" class="add-form" style="background: white; border: 1px solid #ffcc80;">
+                            <input type="text" id="incident-text-home-p2" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, แมลงระบาด)">
+                            <input type="datetime-local" id="incident-date-home-p2">
+                            <button style="background-color: #f57c00;" onclick="window.addIncident('home', 'p2')">บันทึกเหตุการณ์</button>
+                        </div>
+                        <ul id="list-incident-home-p2" class="todo-list"></ul>
+                    </div>
+
+                    <div class="card" id="card-wa-home">
+                        <h3>
+                            <span>🪣 ปริมาณน้ำ (L)
+                                <select id="view-water-zone-home" onchange="window.loadSavedSensorData()" style="font-size: 0.8em; padding: 2px; border-radius: 5px; margin-left: 5px; border: 1px solid #9966ff;">
+                                    <option value="1">จุดที่ 1</option><option value="2">จุดที่ 2</option><option value="3">จุดที่ 3</option>
+                                </select>
+                            </span>
+                            <div class="action-btns"><button class="fullscreen-btn" onclick="window.openFullscreen('wa-home', 'น้ำสะสม (บ้าน)')">🔍 ขยาย</button><button class="clear-chart-btn" onclick="window.clearData('water_acc', 'home')">🗑️ ล้างโซนนี้</button></div>
+                        </h3>
+                        <div class="chart-container" id="container-wa-home"><canvas id="chart-wa-home"></canvas></div>
+                    </div>
+                    <div class="card" id="card-rf-home">
+                        <h3><span>🌧️ ปริมาณน้ำฝน (mm)</span><div class="action-btns"><button class="fullscreen-btn" onclick="window.openFullscreen('rf-home', 'ปริมาณน้ำฝน')">🔍 ขยาย</button><button class="clear-chart-btn" onclick="window.clearData('rainfall', 'home')">🗑️ ล้าง</button></div></h3>
+                        <div class="chart-container" id="container-rf-home"><canvas id="chart-rf-home"></canvas></div>
+                    </div>
+                    <div class="card" id="card-sm-home">
+                        <h3><span>💧 ความชื้นในดิน (%)</span><div class="action-btns"><button class="fullscreen-btn" onclick="window.openFullscreen('sm-home', 'ความชื้นในดิน')">🔍 ขยาย</button><button class="clear-chart-btn" onclick="window.clearData('soil_moisture', 'home')">🗑️ ล้าง</button></div></h3>
+                        <div class="chart-container" id="container-sm-home"><canvas id="chart-sm-home"></canvas></div>
+                    </div>
+                    <div class="card" id="card-li-home">
+                        <h3><span>☀️ ความเข้มแสง (Lux)</span><div class="action-btns"><button class="fullscreen-btn" onclick="window.openFullscreen('li-home', 'ความเข้มแสง')">🔍 ขยาย</button><button class="clear-chart-btn" onclick="window.clearData('light_intensity', 'home')">🗑️ ล้าง</button></div></h3>
+                        <div class="chart-container" id="container-li-home"><canvas id="chart-li-home"></canvas></div>
+                    </div>
+                    <div class="card" id="card-st-home">
+                        <h3><span>🌡️ อุณหภูมิดิน (°C)</span><div class="action-btns"><button class="fullscreen-btn" onclick="window.openFullscreen('st-home', 'อุณหภูมิดิน')">🔍 ขยาย</button><button class="clear-chart-btn" onclick="window.clearData('soil_temp', 'home')">🗑️ ล้าง</button></div></h3>
+                        <div class="chart-container" id="container-st-home"><canvas id="chart-st-home"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="split-screen">
+                    <h1>บ้านสวน (Sensors)</h1>
+                    <div class="card stat-card garden">
+                        <h3 style="display: flex;">🌲 ยอดรวมต้นไม้</h3>
+                        <p class="number" id="tree-garden">0</p>
+                        <p class="stat-note" id="tree-note-garden">นับอัตโนมัติจากชื่อต้นไม้ที่บันทึกไว้</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="display:block; margin-bottom: 10px;">📥 อัปโหลดข้อมูลขึ้น Cloud</h3>
+                        <div class="upload-row">
+                            <select id="data-type-garden">
+                                <option value="auto">🤖 แยกข้อมูลอัตโนมัติ (RainPoint)</option>
+                            </select>
+                            <input type="file" multiple accept=".xlsx, .xls, .csv" onchange="window.handleMultipleFileUpload(event, 'garden')">
+                        </div>
+                        <div class="zone-row">💦 ถ้าเป็นไฟล์ปริมาณน้ำ บันทึกเป็น
+                            <select id="upload-water-zone-garden"><option value="1">จุดที่ 1</option><option value="2">จุดที่ 2</option><option value="3">จุดที่ 3</option></select>
+                        </div>
+                        <div class="upload-msg" id="upload-msg-garden"></div>
+                        <button class="backup-btn" onclick="window.downloadBackup()">💾 ดาวน์โหลดสำรองข้อมูลทั้งหมด (.json)</button>
+                    </div>
+
+                    <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ (หน้า 2 - ซิงค์กับหน้า 1) -->
+                    <div class="card" style="border: 2px solid #ff9800; background: #fffdf5;">
+                        <div class="card-header" style="border-bottom-color: #ffcc80;">
+                            <h3 style="display:block; color: #e65100;">⚠️ บันทึกเหตุการณ์ผิดปกติ</h3>
+                            <button class="toggle-btn" style="background: #ffe0b2; color: #e65100;" onclick="window.toggleForm('form-incident-garden-p2')">+</button>
+                        </div>
+                        <div id="form-incident-garden-p2" class="add-form" style="background: white; border: 1px solid #ffcc80;">
+                            <input type="text" id="incident-text-garden-p2" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, แมลงระบาด)">
+                            <input type="datetime-local" id="incident-date-garden-p2">
+                            <button style="background-color: #f57c00;" onclick="window.addIncident('garden', 'p2')">บันทึกเหตุการณ์</button>
+                        </div>
+                        <ul id="list-incident-garden-p2" class="todo-list"></ul>
+                    </div>
+
+                    <div class="card" id="card-wa-garden">
+                        <h3>
+                            <span>🪣 ปริมาณน้ำ (L)
+                                <select id="view-water-zone-garden" onchange="window.loadSavedSensorData()" style="font-size: 0.8em; padding: 2px; border-radius: 5px; margin-left: 5px; border: 1px solid #9966ff;">
+                                    <option value="1">จุดที่ 1</option><option value="2">จุดที่ 2</option><option value="3">จุดที่ 3</option>
+                                </select>
+                            </span>
+                            <div class="action-btns"><button class="fullscreen-btn" onclick="window.openFullscreen('wa-garden', 'น้ำสะสม (บ้านสวน)')">🔍 ขยาย</button><button class="clear-chart-btn" onclick="window.clearData('water_acc', 'garden')">🗑️ ล้างโซนนี้</button></div>
+                        </h3>
+                        <div class="chart-container" id="container-wa-garden"><canvas id="chart-wa-garden"></canvas></div>
+                    </div>
+                    <div class="card" id="card-rf-garden">
+                        <h3><span>🌧️ ปริมาณน้ำฝน (mm)</span><div class="action-btns"><button class="fullscreen-btn" onclick="window.openFullscreen('rf-garden', 'ปริมาณน้ำฝน')">🔍 ขยาย</button><button class="clear-chart-btn" onclick="window.clearData('rainfall', 'garden')">🗑️ ล้าง</button></div></h3>
+                        <div class="chart-container" id="container-rf-garden"><canvas id="chart-rf-garden"></canvas></div>
+                    </div>
+                    <div class="card" id="card-sm-garden">
+                        <h3><span>💧 ความชื้นในดิน (%)</span><div class="action-btns"><button class="fullscreen-btn" onclick="window.openFullscreen('sm-garden', 'ความชื้นในดิน')">🔍 ขยาย</button><button class="clear-chart-btn" onclick="window.clearData('soil_moisture', 'garden')">🗑️ ล้าง</button></div></h3>
+                        <div class="chart-container" id="container-sm-garden"><canvas id="chart-sm-garden"></canvas></div>
+                    </div>
+                    <div class="card" id="card-li-garden">
+                        <h3><span>☀️ ความเข้มแสง (Lux)</span><div class="action-btns"><button class="fullscreen-btn" onclick="window.openFullscreen('li-garden', 'ความเข้มแสง')">🔍 ขยาย</button><button class="clear-chart-btn" onclick="window.clearData('light_intensity', 'garden')">🗑️ ล้าง</button></div></h3>
+                        <div class="chart-container" id="container-li-garden"><canvas id="chart-li-garden"></canvas></div>
+                    </div>
+                    <div class="card" id="card-st-garden">
+                        <h3><span>🌡️ อุณหภูมิดิน (°C)</span><div class="action-btns"><button class="fullscreen-btn" onclick="window.openFullscreen('st-garden', 'อุณหภูมิดิน')">🔍 ขยาย</button><button class="clear-chart-btn" onclick="window.clearData('soil_temp', 'garden')">🗑️ ล้าง</button></div></h3>
+                        <div class="chart-container" id="container-st-garden"><canvas id="chart-st-garden"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าที่ 3 : ต้นไม้บ้าน -->
+        <div id="page3" class="page-content">
+            <div class="tree-page-container">
+                <h1 style="color: #1a1a1a; margin-bottom: 20px;">🌳 บันทึกข้อมูล (บ้าน)</h1>
+                <div class="tree-form-container">
+                    <div class="form-section">
+                        <h4>ℹ️ ข้อมูลพื้นฐานต้นไม้</h4>
+                        <div class="input-grid">
+                            <input type="text" id="t-name-home" placeholder="ชื่อต้นไม้ (เว้นว่างได้ ถ้าจะบันทึกแค่ปุ๋ย)">
+                            <input type="date" id="t-date-home" title="วันที่บันทึก/ปลูก">
+                            <select id="t-status-home">
+                                <option value="ดีเยี่ยม">🟢 เติบโตดีเยี่ยม</option><option value="ปกติ" selected>🟡 ปกติทั่วไป</option>
+                                <option value="ออกดอก">⚪ กำลังออกดอก/ผล</option><option value="ต้องดูแล">🔴 ป่วย / ต้องดูแลพิเศษ</option>
+                            </select>
+                            <input type="text" id="t-note-home" placeholder="หมายเหตุทั่วไป">
+                        </div>
+                    </div>
+                    <div class="form-section" style="background: #fff8e1; border-color: #ffeeba;">
+                        <h4>🧪 การบำรุงดินและปุ๋ย (บันทึกแยกได้)</h4>
+                        <div class="input-grid">
+                            <input type="date" id="t-fert-date-home" title="วันที่ใส่ปุ๋ย/บำรุงดิน">
+                            <input type="text" id="t-soil-home" placeholder="ชนิดดิน (เช่น ดินร่วน, ดินถุง)">
+                            <input type="text" id="t-fert-home" placeholder="ชนิดปุ๋ย (เช่น มูลวัว, สูตร 15-15-15)">
+                            <input type="text" id="t-amount-home" placeholder="ปริมาณที่ใส่ (เช่น 1 กก., 2 กำมือ)">
+                            <input type="number" id="t-qty-home" placeholder="จำนวนต้นที่ใส่ (ระบุตัวเลข)">
+                        </div>
+                    </div>
+                    <button class="full-width-btn" onclick="window.addIndividualTree('home')">➕ บันทึกข้อมูลทีละรายการ</button>
+
+                    <div class="form-section upload-section" style="margin-top: 15px;">
+                        <h4 style="margin-bottom: 5px;">📥 อัปโหลดข้อมูลจาก Excel (เพิ่มทีเดียวทั้งหมด)</h4>
+                        <div style="font-size: 0.85em; color: #555; margin-bottom: 10px;">
+                            *จัดเรียงหัวคอลัมน์แถวแรกตามนี้: 1.ชื่อต้นไม้ | 2.วันที่บันทึก | 3.สถานะ | 4.วันที่บำรุง | 5.ชนิดดิน | 6.ชนิดปุ๋ย | 7.ปริมาณ | 8.จำนวนต้น | 9.หมายเหตุ
+                        </div>
+                        <input type="file" accept=".xlsx, .xls" onchange="window.handleBulkTreeUpload(event, 'home')" style="padding: 5px; width: 100%; box-sizing: border-box;">
+                    </div>
+                </div>
+                <input type="text" id="search-tree-home" class="search-box" placeholder="🔍 ค้นหาชื่อต้นไม้, วันที่, ชนิดปุ๋ย..." onkeyup="window.renderIndividualTrees('home')">
+                <div id="tree-grid-home" class="tree-grid"></div>
+            </div>
+        </div>
+
+        <!-- หน้าที่ 4 : ต้นไม้บ้านสวน -->
+        <div id="page4" class="page-content">
+            <div class="tree-page-container">
+                <h1 style="color: #1a1a1a; margin-bottom: 20px;">🌲 บันทึกข้อมูล (บ้านสวน)</h1>
+                <div class="tree-form-container">
+                    <div class="form-section">
+                        <h4>ℹ️ ข้อมูลพื้นฐานต้นไม้</h4>
+                        <div class="input-grid">
+                            <input type="text" id="t-name-garden" placeholder="ชื่อต้นไม้ (เว้นว่างได้ ถ้าจะบันทึกแค่ปุ๋ย)">
+                            <input type="date" id="t-date-garden" title="วันที่บันทึก/ปลูก">
+                            <select id="t-status-garden">
+                                <option value="ดีเยี่ยม">🟢 เติบโตดีเยี่ยม</option><option value="ปกติ" selected>🟡 ปกติทั่วไป</option>
+                                <option value="ออกดอก">⚪ กำลังออกดอก/ผล</option><option value="ต้องดูแล">🔴 ป่วย / ต้องดูแลพิเศษ</option>
+                            </select>
+                            <input type="text" id="t-note-garden" placeholder="หมายเหตุทั่วไป">
+                        </div>
+                    </div>
+                    <div class="form-section" style="background: #fff8e1; border-color: #ffeeba;">
+                        <h4>🧪 การบำรุงดินและปุ๋ย (บันทึกแยกได้)</h4>
+                        <div class="input-grid">
+                            <input type="date" id="t-fert-date-garden" title="วันที่ใส่ปุ๋ย/บำรุงดิน">
+                            <input type="text" id="t-soil-garden" placeholder="ชนิดดิน">
+                            <input type="text" id="t-fert-garden" placeholder="ชนิดปุ๋ย">
+                            <input type="text" id="t-amount-garden" placeholder="ปริมาณที่ใส่">
+                            <input type="number" id="t-qty-garden" placeholder="จำนวนต้นที่ใส่">
+                        </div>
+                    </div>
+                    <button class="full-width-btn" onclick="window.addIndividualTree('garden')">➕ บันทึกข้อมูลทีละรายการ</button>
+
+                    <div class="form-section upload-section" style="margin-top: 15px;">
+                        <h4 style="margin-bottom: 5px;">📥 อัปโหลดข้อมูลจาก Excel (เพิ่มทีเดียวทั้งหมด)</h4>
+                        <div style="font-size: 0.85em; color: #555; margin-bottom: 10px;">
+                            *จัดเรียงหัวคอลัมน์แถวแรกตามนี้: 1.ชื่อต้นไม้ | 2.วันที่บันทึก | 3.สถานะ | 4.วันที่บำรุง | 5.ชนิดดิน | 6.ชนิดปุ๋ย | 7.ปริมาณ | 8.จำนวนต้น | 9.หมายเหตุ
+                        </div>
+                        <input type="file" accept=".xlsx, .xls" onchange="window.handleBulkTreeUpload(event, 'garden')" style="padding: 5px; width: 100%; box-sizing: border-box;">
+                    </div>
+                </div>
+                <input type="text" id="search-tree-garden" class="search-box" placeholder="🔍 ค้นหาชื่อต้นไม้, วันที่, ชนิดปุ๋ย..." onkeyup="window.renderIndividualTrees('garden')">
+                <div id="tree-grid-garden" class="tree-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal กราฟ -->
+    <div id="chart-modal" class="modal-overlay" onclick="window.closeFullscreen(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="close-modal-btn" onclick="window.closeFullscreen(null, true)">✖</button>
+            <h3 id="modal-title">ชื่อกราฟ</h3>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- ================= FIREBASE CLOUD SCRIPT ================= -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9-l2Yxs7-Dn3_skx5HSkB5R9pauSLz2w",
+            authDomain: "smart-dashboard-3803c.firebaseapp.com",
+            databaseURL: "https://smart-dashboard-3803c-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "smart-dashboard-3803c",
+            storageBucket: "smart-dashboard-3803c.firebasestorage.app",
+            messagingSenderId: "749095844076",
+            appId: "1:749095844076:web:8390b4329a330f6ecf0dc9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let myUid = null;
+        let cloudData = {};
+
+        let inactivityTimer;
+        const IDLE_TIMEOUT = 15 * 60 * 1000;
+
+        function resetTimer() {
+            if (!myUid) return;
+            localStorage.setItem('smartFarm_lastActive', Date.now().toString());
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                alert("🔒 ระบบได้ทำการออกจากระบบอัตโนมัติ เนื่องจากไม่มีการใช้งานบนหน้าเว็บเกิน 15 นาทีครับ");
+                window.handleLogout();
+            }, IDLE_TIMEOUT);
+        }
+
+        ['mousemove', 'mousedown', 'keypress', 'touchmove', 'scroll', 'click'].forEach(event => {
+            document.addEventListener(event, resetTimer, true);
+        });
+
+        const today = new Date();
+        document.getElementById('global-month').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+
+        window.handleLogin = () => {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            signInWithEmailAndPassword(auth, email, pass)
+                .then(() => { document.getElementById('login-error').style.display = 'none'; })
+                .catch(error => { document.getElementById('login-error').style.display = 'block'; });
+        };
+        window.handleLogout = () => { signOut(auth).then(() => { location.reload(); }); };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const lastActive = localStorage.getItem('smartFarm_lastActive');
+                if (lastActive && (Date.now() - parseInt(lastActive) > IDLE_TIMEOUT)) {
+                    localStorage.removeItem('smartFarm_lastActive');
+                    signOut(auth).then(() => {
+                        alert("🔒 เซสชันหมดอายุ: คุณไม่ได้เปิดหน้าเว็บฟาร์มนานเกิน 15 นาที กรุณาล็อกอินใหม่เพื่อความปลอดภัยครับ");
+                        location.reload();
+                    });
+                    return;
+                }
+                myUid = user.uid;
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+
+                onValue(ref(db, 'shared_farm_data'), (snapshot) => {
+                    cloudData = snapshot.val() || {};
+                    window.refreshAllUI();
+                });
+                resetTimer();
+            } else {
+                myUid = null;
+                clearTimeout(inactivityTimer);
+                localStorage.removeItem('smartFarm_lastActive');
+            }
+        });
+
+        function getStorage(key, isArray = true) { return cloudData[key] !== undefined ? cloudData[key] : (isArray ? [] : null); }
+        // อัปเดตข้อมูลในเครื่องทันที (อัปโหลดหลายไฟล์ติดกันจะรวมกันถูกต้อง) แล้วค่อยส่งขึ้น Cloud
+        function saveStorage(key, data) {
+            if(!myUid) return Promise.resolve(false);
+            cloudData[key] = data;
+            return set(ref(db, `shared_farm_data/${key}`), data)
+                .then(() => true)
+                .catch(err => { console.error(err); alert("⚠️ บันทึกขึ้น Cloud ไม่สำเร็จ: " + err.message); return false; });
+        }
+        function deleteStorage(key) {
+            if(!myUid) return;
+            delete cloudData[key];
+            remove(ref(db, `shared_farm_data/${key}`)).catch(err => alert("⚠️ ลบข้อมูลไม่สำเร็จ: " + err.message));
+        }
+        // กันข้อความที่ผู้ใช้พิมพ์ไปแสดงเป็นโค้ด HTML
+        function esc(v) { return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        function asArray(v) { return Array.isArray(v) ? v.filter(Boolean) : Object.values(v || {}).filter(Boolean); }
+        // แสดงตัวเลข หรือ "ยังไม่มีข้อมูล" ถ้าเดือนนั้นไม่มีข้อมูล (แทนการโชว์ 0 ที่ทำให้เข้าใจผิด)
+        function setStat(id, value) {
+            const el = document.getElementById(id);
+            if (value === null) { el.innerText = 'ยังไม่มีข้อมูล'; el.classList.add('no-data'); }
+            else { el.innerText = value; el.classList.remove('no-data'); }
+        }
+
+        window.refreshAllUI = () => {
+            renderTodos('home'); renderTodos('garden');
+            updateUrgentBanner();
+            renderIncidents('home'); renderIncidents('garden');
+            window.renderIndividualTrees('home'); window.renderIndividualTrees('garden');
+            window.loadSavedSensorData();
+            window.updatePage1Averages('home');
+            window.updatePage1Averages('garden');
+        };
+
+        window.switchTab = (pageId, btnElement) => {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            btnElement.classList.add('active');
+            Object.values(myCharts).forEach(chart => chart.resize());
+        };
+        // มือถือ: เลือกดูทีละพื้นที่ (จำค่าไว้ในเครื่อง)
+        window.setSite = (site) => {
+            document.body.classList.toggle('show-home', site === 'home');
+            document.body.classList.toggle('show-garden', site === 'garden');
+            document.querySelectorAll('.site-switch button').forEach(b => b.classList.toggle('on', b.dataset.site === site));
+            try { localStorage.setItem('smartFarm_site', site); } catch (e) {}
+            // ถ้ากำลังเปิดหน้าต้นไม้ ให้สลับไปหน้าต้นไม้ของพื้นที่ที่เลือก
+            const treePages = { home: 'page3', garden: 'page4' };
+            const activePage = document.querySelector('.page-content.active');
+            if (activePage && (activePage.id === 'page3' || activePage.id === 'page4') && activePage.id !== treePages[site]) {
+                const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => (b.getAttribute('onclick') || '').includes(`'${treePages[site]}'`));
+                if (btn) window.switchTab(treePages[site], btn);
+            }
+            Object.values(myCharts).forEach(chart => chart.resize());
+        };
+        (() => { let s = 'home'; try { s = localStorage.getItem('smartFarm_site') || 'home'; } catch (e) {} document.addEventListener('DOMContentLoaded', () => window.setSite(s)); })();
+
+        window.toggleForm = (id) => { const el = document.getElementById(id); el.style.display = (el.style.display === "none" || el.style.display === "") ? "flex" : "none"; };
+
+        function filterByMonth(records, selectedMonth) {
+            records = asArray(records);
+            if (!selectedMonth) return records;
+            return records.filter(r => {
+                const d = new Date(r.t);
+                const m = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+                return m === selectedMonth;
+            });
+        }
+        function formatChartLabels(records) { return records.map(r => { let d = new Date(r.t); return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }); }
+        function calcHourlyProfile(records) {
+            let sums = Array(24).fill(0), counts = Array(24).fill(0);
+            records.forEach(r => { const h = new Date(r.t).getHours(); sums[h] += r.v; counts[h]++; });
+            return sums.map((s, i) => counts[i] ? parseFloat((s/counts[i]).toFixed(1)) : null);
+        }
+
+        window.updatePage1Averages = (loc) => {
+            const currentMonth = document.getElementById('global-month').value;
+            const currentYear = currentMonth.split('-')[0];
+            const hours24 = Array.from({length: 24}, (_, i) => `${String(i).padStart(2,'0')}:00`);
+            const monthsLabel = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+            const selectedZone = document.getElementById(`avg-water-zone-${loc}`).value;
+            const waterData = getStorage(`sensor_water_acc_${selectedZone}_${loc}`, false);
+            const recordsWa = filterByMonth(waterData?.records, currentMonth);
+            // ข้อมูลน้ำจาก RainPoint เป็นยอดรวมรายวัน จึงเฉลี่ยได้เป็น L/วัน
+            setStat(`avg-wa-val-${loc}`, recordsWa.length > 0 ? (recordsWa.reduce((sum, r) => sum + r.v, 0) / recordsWa.length).toFixed(1) : null);
+
+            const rfData = getStorage(`sensor_rainfall_${loc}`, false);
+            const recordsRF_month = filterByMonth(rfData?.records, currentMonth);
+            setStat(`sum-rf-val-${loc}`, recordsRF_month.length > 0 ? recordsRF_month.reduce((sum, r) => sum + r.v, 0).toFixed(1) : null);
+
+            updateYearlyChart(myCharts[`yearly-rf-${loc}`], [rfData], +currentYear, 'mm', '#17a2b8');
+            updateYearlyChart(myCharts[`yearly-wa-${loc}`], [waterData], +currentYear, 'L', loc === 'home' ? '#0056b3' : '#28a745');
+
+            const smData = getStorage(`sensor_soil_moisture_${loc}`, false);
+            updateChart(myCharts[`avg-sm-${loc}`], 'ความชื้นเฉลี่ย (%)', hours24, calcHourlyProfile(filterByMonth(smData?.records, currentMonth)), '#36a2eb');
+
+            const stData = getStorage(`sensor_soil_temp_${loc}`, false);
+            updateChart(myCharts[`avg-st-${loc}`], 'อุณหภูมิเฉลี่ย (°C)', hours24, calcHourlyProfile(filterByMonth(stData?.records, currentMonth)), '#ff6384');
+
+            renderCompare(loc, currentMonth);
+        };
+
+        // ---------- เปรียบเทียบข้ามเดือน / ข้ามปี ----------
+        const TH_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+        const monthLabel = (ym) => { const [y, m] = ym.split('-').map(Number); return `${TH_MONTHS[m-1]} ${String(y + 543).slice(2)}`; };
+        const shiftMonth = (ym, n) => { const [y, m] = ym.split('-').map(Number); const d = new Date(y, m - 1 + n, 1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; };
+
+        function monthStats(loc, ym) {
+            const recs = (key) => filterByMonth(getStorage(key, false)?.records, ym);
+            const sum = (a) => a.length ? a.reduce((x, r) => x + r.v, 0) : null;
+            const avg = (a) => a.length ? a.reduce((x, r) => x + r.v, 0) / a.length : null;
+            // น้ำ: รวมทุกจุดในแต่ละวัน แล้วเฉลี่ยต่อวัน (เทียบได้แม้เดือนนี้ยังไม่ครบเดือน)
+            const perDay = {};
+            ['1','2','3'].forEach(z => recs(`sensor_water_acc_${z}_${loc}`).forEach(r => { const d = new Date(r.t).toDateString(); perDay[d] = (perDay[d] || 0) + r.v; }));
+            const days = Object.values(perDay);
+            return {
+                water: days.length ? days.reduce((a, b) => a + b, 0) / days.length : null,
+                rain: sum(recs(`sensor_rainfall_${loc}`)),
+                sm: avg(recs(`sensor_soil_moisture_${loc}`)),
+                st: avg(recs(`sensor_soil_temp_${loc}`)),
+            };
+        }
+
+        function renderCompare(loc, ym) {
+            const box = document.getElementById(`compare-${loc}`);
+            if (!box || !ym) return;
+            const cols = [ym, shiftMonth(ym, -1), shiftMonth(ym, -12)];
+            const stats = cols.map(c => monthStats(loc, c));
+            const rows = [
+                { k: 'water', name: '💦 น้ำใช้เฉลี่ย', unit: 'L/วัน', dp: 0, pct: true },
+                { k: 'rain', name: '🌧️ น้ำฝนรวม', unit: 'mm', dp: 1, pct: true },
+                { k: 'sm', name: '💧 ความชื้นดินเฉลี่ย', unit: '%', dp: 1, pct: false },
+                { k: 'st', name: '🌡️ อุณหภูมิดินเฉลี่ย', unit: '°C', dp: 1, pct: false },
+            ];
+            const fmt = (v, dp) => v === null ? '–' : Number(v).toLocaleString('th-TH', { maximumFractionDigits: dp });
+            // แสดงผลต่าง: น้ำ/ฝน เป็น %, ความชื้น/อุณหภูมิ เป็นหน่วยจริง
+            const change = (now, old, r) => {
+                if (now === null || old === null) return '';
+                const diff = now - old;
+                if (Math.abs(diff) < 0.05) return '<span class="chg">เท่าเดิม</span>';
+                const cls = diff > 0 ? 'up' : 'down', word = diff > 0 ? 'เดือนนี้มากกว่า' : 'เดือนนี้น้อยกว่า';
+                const txt = r.pct ? (old === 0 ? `+${fmt(diff, r.dp)} ${r.unit}` : `${Math.abs(diff / old * 100).toFixed(0)}%`) : `${fmt(Math.abs(diff), 1)} ${r.unit}`;
+                return `<span class="chg ${cls}" title="${word}">${txt}</span>`;
+            };
+            const anyData = stats.some(st => Object.values(st).some(v => v !== null));
+            if (!anyData) { box.innerHTML = '<p style="color:#999; margin:0;">ยังไม่มีข้อมูลให้เปรียบเทียบ</p>'; return; }
+            box.innerHTML = `<table class="compare-table"><thead><tr><th></th><th>${monthLabel(cols[0])}</th><th>เดือนก่อน<br>${monthLabel(cols[1])}</th><th>ปีที่แล้ว<br>${monthLabel(cols[2])}</th></tr></thead><tbody>${
+                rows.map(r => {
+                    const [a, b, c] = stats.map(st => st[r.k]);
+                    return `<tr><td>${r.name} <span style="color:#999;font-size:0.85em">(${r.unit})</span></td><td class="now">${fmt(a, r.dp)}</td><td>${fmt(b, r.dp)}${change(a, b, r)}</td><td>${fmt(c, r.dp)}${change(a, c, r)}</td></tr>`;
+                }).join('')
+            }</tbody></table>`;
+        }
+
+        // กราฟรายเดือนทั้งปี: ปีนี้ เทียบกับ ปีที่แล้ว
+        function updateYearlyChart(chart, sources, year, unit, color) {
+            const sums = (y) => {
+                const arr = Array(12).fill(0); let has = false;
+                sources.forEach(src => asArray(src?.records).forEach(r => { const d = new Date(r.t); if (d.getFullYear() === y) { arr[d.getMonth()] += r.v; has = true; } }));
+                return has ? arr.map(v => parseFloat(v.toFixed(1))) : null;
+            };
+            const cur = sums(year), prev = sums(year - 1);
+            chart.data.labels = TH_MONTHS;
+            chart.data.datasets = [];
+            if (prev) chart.data.datasets.push({ label: `ปี ${year + 542} (${unit})`, data: prev, backgroundColor: 'rgba(160,160,160,0.45)', borderRadius: 4, borderWidth: 0 });
+            chart.data.datasets.push({ label: `ปี ${year + 543} (${unit})`, data: cur || Array(12).fill(0), backgroundColor: hexToRgba(color, 0.85), borderRadius: 4, borderWidth: 0 });
+            chart.options.plugins.legend.display = !!prev;
+            chart.options.plugins.legend.labels = { boxWidth: 12, font: { size: 11 } };
+            chart.update();
+        }
+
+        // ================= To-Do System =================
+        function renderTodos(loc) {
+            const list = document.getElementById(`list-todo-${loc}`);
+            const todos = getStorage(`todos_${loc}`, true);
+            list.innerHTML = '';
+
+            todos.forEach((todo, idx) => {
+                const li = document.createElement('li');
+                if(todo.completed) li.className = 'completed';
+
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.checked = todo.completed;
+                cb.onchange = () => {
+                    todos[idx].completed = !todos[idx].completed;
+                    saveStorage(`todos_${loc}`, todos);
+                    renderTodos(loc);
+                };
+
+                const sp = document.createElement('span');
+                sp.className = 'task-text';
+                sp.innerText = todo.text;
+
+                li.appendChild(cb);
+                li.appendChild(sp);
+
+                if(todo.date) {
+                    const dateObj = new Date(todo.date);
+                    const dateSpan = document.createElement('span');
+                    dateSpan.className = 'due-date';
+                    dateSpan.innerHTML = `🕒 ${dateObj.toLocaleDateString('th-TH')} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
+
+                    const calBtn = document.createElement('button');
+                    calBtn.innerHTML = '🗓️';
+                    calBtn.style.background = 'none';
+                    calBtn.style.border = 'none';
+                    calBtn.style.cursor = 'pointer';
+                    calBtn.style.marginLeft = '5px';
+                    calBtn.title = 'บันทึกลง Google Calendar';
+
+                    calBtn.onclick = () => {
+                        const dEnd = new Date(dateObj.getTime() + 60*60*1000);
+                        const startStr = dateObj.toISOString().replace(/-|:|\.\d\d\d/g,"");
+                        const endStr = dEnd.toISOString().replace(/-|:|\.\d\d\d/g,"");
+                        const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(todo.text)}&dates=${startStr}/${endStr}&details=${encodeURIComponent('รายการจาก Smart Farm Dashboard')}`;
+                        window.open(url, '_blank');
+                    };
+
+                    dateSpan.appendChild(calBtn);
+                    li.appendChild(dateSpan);
+                }
+
+                const del = document.createElement('button');
+                del.className = 'delete-btn';
+                del.innerHTML = '🗑️';
+                del.style.background = 'none';
+                del.style.border = 'none';
+                del.style.cursor = 'pointer';
+                del.style.color = 'red';
+                del.onclick = () => {
+                    if (!confirm(`ลบรายการ "${todo.text}" ใช่หรือไม่?`)) return;
+                    todos.splice(idx, 1);
+                    saveStorage(`todos_${loc}`, todos);
+                    renderTodos(loc);
+                };
+                li.appendChild(del);
+
+                list.appendChild(li);
+            });
+        }
+
+        // แจ้งเตือนรายการที่ต้องทำภายใน 24 ชม. (และที่เลยกำหนดแล้ว)
+        let dismissedUrgent = '';
+        function updateUrgentBanner() {
+            const now = Date.now(), soon = now + 24*60*60*1000;
+            const items = [];
+            [['home','บ้าน'],['garden','บ้านสวน']].forEach(([loc, name]) => {
+                asArray(getStorage(`todos_${loc}`, true)).forEach(t => {
+                    if (t.completed || !t.date) return;
+                    const due = new Date(t.date).getTime();
+                    if (isNaN(due) || due > soon) return;
+                    items.push(`${t.text} (${name}${due < now ? ', เลยกำหนด' : ''})`);
+                });
+            });
+            const banner = document.getElementById('notification-banner');
+            const sig = items.join('|');
+            if (items.length && sig !== dismissedUrgent) {
+                document.getElementById('urgent-task-list').innerText = items.join(' · ');
+                banner.style.display = 'block';
+                banner.querySelector('.close-alert-btn').onclick = () => { dismissedUrgent = sig; banner.style.display = 'none'; };
+            } else if (!items.length) banner.style.display = 'none';
+        }
+
+        window.addTodo = (loc) => {
+            const txt = document.getElementById(`todo-text-${loc}`).value;
+            const dt = document.getElementById(`todo-date-${loc}`).value;
+            if(!txt.trim()) return;
+
+            const todos = getStorage(`todos_${loc}`, true);
+            todos.push({text: txt, date: dt, completed: false});
+            saveStorage(`todos_${loc}`, todos);
+
+            document.getElementById(`todo-text-${loc}`).value = '';
+            document.getElementById(`todo-date-${loc}`).value = '';
+
+            renderTodos(loc);
+        };
+
+        // ================= Incident System =================
+        function renderIncidents(loc) {
+            const incidents = getStorage(`incidents_${loc}`, true);
+            const listP1 = document.getElementById(`list-incident-${loc}`);
+            const listP2 = document.getElementById(`list-incident-${loc}-p2`);
+
+            const buildList = (container) => {
+                if(!container) return;
+                container.innerHTML = '';
+                incidents.forEach((inc, idx) => {
+                    const li = document.createElement('li');
+                    li.style.borderBottomColor = '#ffe0b2';
+
+                    const sp = document.createElement('span');
+                    sp.className = 'task-text';
+                    sp.innerText = inc.text;
+                    li.appendChild(sp);
+
+                    if(inc.date) {
+                        const dateObj = new Date(inc.date);
+                        const dateSpan = document.createElement('span');
+                        dateSpan.className = 'due-date';
+                        dateSpan.style.backgroundColor = '#ffe0b2';
+                        dateSpan.style.color = '#e65100';
+                        dateSpan.innerHTML = `🕒 ${dateObj.toLocaleDateString('th-TH')} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
+                        li.appendChild(dateSpan);
+                    }
+
+                    const del = document.createElement('button');
+                    del.className = 'delete-btn';
+                    del.innerHTML = '✖';
+                    del.style.background = 'none';
+                    del.style.border = 'none';
+                    del.style.cursor = 'pointer';
+                    del.style.color = '#e65100';
+                    del.style.fontWeight = 'bold';
+                    del.style.marginLeft = '10px';
+                    del.onclick = () => {
+                        if (!confirm(`ลบเหตุการณ์ "${inc.text}" ใช่หรือไม่?`)) return;
+                        incidents.splice(idx, 1);
+                        saveStorage(`incidents_${loc}`, incidents);
+                        renderIncidents(loc);
+                    };
+                    li.appendChild(del);
+                    container.appendChild(li);
+                });
+            };
+
+            buildList(listP1);
+            buildList(listP2);
+        }
+
+        window.addIncident = (loc, pageSuffix = '') => {
+            const suffix = pageSuffix ? `-${pageSuffix}` : '';
+            const txtEl = document.getElementById(`incident-text-${loc}${suffix}`);
+            const dtEl = document.getElementById(`incident-date-${loc}${suffix}`);
+
+            if(!txtEl || !txtEl.value.trim()) return;
+
+            const incidents = getStorage(`incidents_${loc}`, true);
+            incidents.push({text: txtEl.value, date: dtEl.value});
+            saveStorage(`incidents_${loc}`, incidents);
+
+            txtEl.value = '';
+            dtEl.value = '';
+
+            renderIncidents(loc);
+        };
+
+        window.downloadICS = (loc) => {
+            const todos = getStorage(`todos_${loc}`, true);
+            const tasksWithDate = todos.filter(t => t.date && !t.completed);
+
+            if(tasksWithDate.length === 0) {
+                alert('⚠️ ไม่มีรายการที่ตั้งเวลาไว้ หรือรายการทั้งหมดเสร็จสิ้นแล้วครับ');
+                return;
+            }
+
+            let icsContent = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Smart Farm Dashboard//TH\r\nCALSCALE:GREGORIAN\r\n";
+
+            tasksWithDate.forEach(todo => {
+                const startDate = new Date(todo.date);
+                const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+
+                const formatICSDate = (date) => {
+                    const pad = (n) => String(n).padStart(2, '0');
+                    return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}T${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
+                };
+
+                icsContent += "BEGIN:VEVENT\r\n";
+                icsContent += `SUMMARY:${todo.text}\r\n`;
+                icsContent += `DTSTART:${formatICSDate(startDate)}\r\n`;
+                icsContent += `DTEND:${formatICSDate(endDate)}\r\n`;
+                icsContent += `DESCRIPTION:รายการจาก Smart Farm Dashboard (${loc === 'home' ? 'บ้าน' : 'บ้านสวน'})\r\n`;
+                icsContent += "END:VEVENT\r\n";
+            });
+
+            icsContent += "END:VCALENDAR\r\n";
+
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Farm_Tasks_${loc}.ics`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        window.renderIndividualTrees = (loc) => {
+            const grid = document.getElementById(`tree-grid-${loc}`);
+            let rawTrees = getStorage(`individual_trees_${loc}`, true);
+            const trees = Array.isArray(rawTrees) ? rawTrees : Object.values(rawTrees || {});
+
+            grid.innerHTML = '';
+
+            const searchQuery = (document.getElementById(`search-tree-${loc}`)?.value || '').toLowerCase();
+
+            trees.forEach((tree, originalIdx) => {
+                if (!tree) return;
+
+                const formattedDate = tree.date ? new Date(tree.date).toLocaleDateString('th-TH') : '';
+                const formattedFertDate = tree.fertDate ? new Date(tree.fertDate).toLocaleDateString('th-TH') : '';
+
+                if(searchQuery) {
+                    const targetStr = `${tree.name || ''} ${formattedDate} ${formattedFertDate} ${tree.status || ''} ${tree.note || ''} ${tree.soil || ''} ${tree.fert || ''}`.toLowerCase();
+                    if(!targetStr.includes(searchQuery)) return;
+                }
+
+                const card = document.createElement('div');
+                card.className = `tree-card`;
+
+                const isFertOnly = !tree.name;
+
+                if (isFertOnly) {
+                    card.style.borderLeftColor = '#856404';
+                    card.style.backgroundColor = '#fffcf5';
+                } else if(loc === 'garden') {
+                    card.style.borderLeftColor = '#0056b3';
+                }
+
+                let extraInfo = '';
+                if(tree.soil || tree.fert || tree.amount || tree.qty || tree.fertDate) {
+                    extraInfo += `<div style="background: #fdfbf7; padding: 12px; border-radius: 8px; margin-top: ${isFertOnly ? '10px' : '15px'}; font-size: 0.9em; border: 1px dashed #d1c4a5;">`;
+                    if(!isFertOnly) extraInfo += `<div style="margin-bottom: 8px; font-weight: bold; color: #856404;">🧪 บันทึกการบำรุง:</div>`;
+
+                    if(tree.fertDate) extraInfo += `<div style="margin-bottom:4px; color:#28a745;">📅 <strong>วันที่บำรุง:</strong> ${formattedFertDate}</div>`;
+                    if(tree.soil) extraInfo += `<div style="margin-bottom:4px;">🪨 <strong>ชนิดดิน:</strong> ${esc(tree.soil)}</div>`;
+                    if(tree.fert) extraInfo += `<div style="margin-bottom:4px;">🧪 <strong>ชนิดปุ๋ย:</strong> ${esc(tree.fert)}</div>`;
+                    if(tree.amount) extraInfo += `<div style="margin-bottom:4px;">⚖️ <strong>ปริมาณ:</strong> ${esc(tree.amount)}</div>`;
+                    if(tree.qty) extraInfo += `<div>🌳 <strong>จำนวน:</strong> ${esc(tree.qty)} ต้น</div>`;
+                    extraInfo += `</div>`;
+                }
+
+                let cardContent = `<button class="delete-tree-btn" onclick="window.deleteIndividualTree('${loc}', ${originalIdx})" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.2em; color: red; cursor: pointer;">🗑️</button>`;
+
+                if (isFertOnly) {
+                    cardContent += `<h4 style="color: #856404;">🌾 บันทึกการบำรุง (ทั่วไป)</h4>`;
+                    if(tree.note) cardContent += `<p>📝 <strong>หมายเหตุ:</strong> ${esc(tree.note)}</p>`;
+                    cardContent += extraInfo;
+                } else {
+                    cardContent += `<h4>${esc(tree.name)}</h4>`;
+                    if(formattedDate) cardContent += `<p>🕒 <strong>วันที่บันทึก/ปลูก:</strong> ${formattedDate}</p>`;
+                    cardContent += `<p>📊 <strong>สถานะ:</strong> <span class="status-badge status-${esc(tree.status)}">${esc(tree.status)}</span></p>`;
+                    if(tree.note) cardContent += `<p>📝 <strong>หมายเหตุ:</strong> ${esc(tree.note)}</p>`;
+                    cardContent += extraInfo;
+                }
+
+                card.innerHTML = cardContent;
+                grid.appendChild(card);
+            });
+        };
+
+        window.addIndividualTree = (loc) => {
+            try {
+                const name = document.getElementById(`t-name-${loc}`).value.trim();
+                const date = document.getElementById(`t-date-${loc}`).value;
+                const status = document.getElementById(`t-status-${loc}`).value;
+
+                const fertDateEl = document.getElementById(`t-fert-date-${loc}`);
+                const fertDate = fertDateEl ? fertDateEl.value : '';
+
+                const soil = document.getElementById(`t-soil-${loc}`).value.trim();
+                const fert = document.getElementById(`t-fert-${loc}`).value.trim();
+                const amount = document.getElementById(`t-amount-${loc}`).value.trim();
+                const qty = document.getElementById(`t-qty-${loc}`).value.trim();
+                const note = document.getElementById(`t-note-${loc}`).value.trim();
+
+                if(!name && !soil && !fert && !note && !amount && !qty && !fertDate && !date) {
+                    alert("⚠️ กรุณากรอกข้อมูลอย่างน้อย 1 ช่องก่อนกดบันทึกครับ");
+                    return;
+                }
+
+                let rawTrees = getStorage(`individual_trees_${loc}`, true);
+                let trees = Array.isArray(rawTrees) ? rawTrees : Object.values(rawTrees || {});
+
+                trees.push({name, date, status, fertDate, soil, fert, amount, qty, note});
+                saveStorage(`individual_trees_${loc}`, trees);
+
+                document.getElementById(`t-name-${loc}`).value = '';
+                document.getElementById(`t-date-${loc}`).value = '';
+                if(fertDateEl) fertDateEl.value = '';
+                document.getElementById(`t-soil-${loc}`).value = '';
+                document.getElementById(`t-fert-${loc}`).value = '';
+                document.getElementById(`t-amount-${loc}`).value = '';
+                document.getElementById(`t-qty-${loc}`).value = '';
+                document.getElementById(`t-note-${loc}`).value = '';
+
+                window.renderIndividualTrees(loc);
+                setTimeout(() => alert("✅ บันทึกข้อมูลเรียบร้อยแล้ว!"), 100);
+            } catch(e) {
+                alert("เกิดข้อผิดพลาดในการบันทึก: " + e.message);
+            }
+        };
+
+        window.handleBulkTreeUpload = (event, loc) => {
+            const file = event.target.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, {type: 'binary', cellDates: true});
+                    const excelData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1});
+
+                    let rawTrees = getStorage(`individual_trees_${loc}`, true);
+                    let trees = Array.isArray(rawTrees) ? rawTrees : Object.values(rawTrees || {});
+
+                    let addedCount = 0;
+
+                    const parseDate = (val) => {
+                        if (!val) return '';
+                        // ใช้วันที่ตามเวลาไทย (toISOString เป็นเวลา UTC ทำให้วันที่เลื่อนไป 1 วัน)
+                        const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                        if (val instanceof Date) return ymd(val);
+                        const parsed = new Date(val);
+                        if(!isNaN(parsed.getTime())) return ymd(parsed);
+                        return String(val);
+                    };
+
+                    for(let i = 1; i < excelData.length; i++) {
+                        const row = excelData[i];
+                        if(!row || row.length === 0) continue;
+
+                        const name = row[0] ? String(row[0]).trim() : '';
+                        const date = parseDate(row[1]);
+                        const status = row[2] ? String(row[2]).trim() : 'ปกติ';
+                        const fertDate = parseDate(row[3]);
+                        const soil = row[4] ? String(row[4]).trim() : '';
+                        const fert = row[5] ? String(row[5]).trim() : '';
+                        const amount = row[6] ? String(row[6]).trim() : '';
+                        const qty = row[7] ? String(row[7]).trim() : '';
+                        const note = row[8] ? String(row[8]).trim() : '';
+
+                        if(name || soil || fert || note || amount || qty || fertDate || date) {
+                            trees.push({name, date, status, fertDate, soil, fert, amount, qty, note});
+                            addedCount++;
+                        }
+                    }
+
+                    saveStorage(`individual_trees_${loc}`, trees);
+                    window.renderIndividualTrees(loc);
+                    alert(`✅ อัปโหลดสำเร็จ! เพิ่มข้อมูลทั้งหมด ${addedCount} รายการ`);
+
+                } catch(error) {
+                    alert("เกิดข้อผิดพลาดในการอ่านไฟล์ Excel: " + error.message);
+                }
+            };
+            reader.readAsBinaryString(file);
+            event.target.value = '';
+        };
+
+        window.deleteIndividualTree = (loc, idx) => {
+            if(confirm("คุณต้องการลบข้อมูลนี้ใช่หรือไม่?")) {
+                let rawTrees = getStorage(`individual_trees_${loc}`, true);
+                let trees = Array.isArray(rawTrees) ? rawTrees : Object.values(rawTrees || {});
+                trees.splice(idx, 1);
+                saveStorage(`individual_trees_${loc}`, trees);
+                window.renderIndividualTrees(loc);
+            }
+        };
+
+        function hexToRgba(hex, alpha) { let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16); return `rgba(${r}, ${g}, ${b}, ${alpha})`; }
+        Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"; Chart.defaults.color = '#777';
+        // ถ้ากราฟไม่มีข้อมูล ให้เขียนข้อความบอกแทนกราฟว่างเปล่า
+        Chart.register({ id: 'noData', afterDraw(chart) {
+            const hasData = chart.data.datasets.some(ds => (ds.data || []).some(v => v !== null && v !== undefined && v !== 0));
+            if (hasData) return;
+            const { ctx, chartArea: a } = chart; if (!a) return;
+            ctx.save(); ctx.fillStyle = '#999'; ctx.font = "15px 'Segoe UI', Tahoma, sans-serif"; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('ยังไม่มีข้อมูล', (a.left + a.right) / 2, (a.top + a.bottom) / 2);
+            ctx.restore();
+        } });
+        let myCharts = {};
+
+        function initCharts() {
+            const config = (type) => ({ type: type, data: { labels: [], datasets: [] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: 0 }, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false }, tooltip: { usePointStyle: true, bodyFont: { size: 14, weight: 'bold' } } }, scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 8, font: {size: 11} } }, y: { grid: { color: 'rgba(0,0,0,0.05)', drawBorder: false } } } } });
+            ['home', 'garden'].forEach(l => {
+                myCharts[`rf-${l}`] = new Chart(document.getElementById(`chart-rf-${l}`).getContext('2d'), config('bar')); myCharts[`wa-${l}`] = new Chart(document.getElementById(`chart-wa-${l}`).getContext('2d'), config('bar'));
+                myCharts[`sm-${l}`] = new Chart(document.getElementById(`chart-sm-${l}`).getContext('2d'), config('line')); myCharts[`li-${l}`] = new Chart(document.getElementById(`chart-li-${l}`).getContext('2d'), config('line')); myCharts[`st-${l}`] = new Chart(document.getElementById(`chart-st-${l}`).getContext('2d'), config('line'));
+                myCharts[`avg-sm-${l}`] = new Chart(document.getElementById(`chart-avg-sm-${l}`).getContext('2d'), config('line')); myCharts[`avg-st-${l}`] = new Chart(document.getElementById(`chart-avg-st-${l}`).getContext('2d'), config('line'));
+                myCharts[`yearly-rf-${l}`] = new Chart(document.getElementById(`chart-yearly-rf-${l}`).getContext('2d'), config('bar')); myCharts[`yearly-wa-${l}`] = new Chart(document.getElementById(`chart-yearly-wa-${l}`).getContext('2d'), config('bar'));
+            });
+        }
+
+        window.loadSavedSensorData = () => {
+            const currentMonth = document.getElementById('global-month').value;
+            ['home', 'garden'].forEach(loc => {
+                // นับอัตโนมัติ: ชื่อต้นไม้ที่ไม่ซ้ำกัน (รายการที่บันทึกแค่ปุ๋ยโดยไม่มีชื่อ จะไม่ถูกนับ)
+                const latest = {};
+                asArray(getStorage(`individual_trees_${loc}`, true)).forEach(t => {
+                    const name = String(t.name || '').trim();
+                    if (!name) return;
+                    const k = name.toLowerCase();
+                    if (!latest[k] || String(t.date || '') >= String(latest[k].date || '')) latest[k] = t;
+                });
+                const list = Object.values(latest);
+                const needCare = list.filter(t => t.status === 'ต้องดูแล').length;
+                document.getElementById(`tree-${loc}`).innerText = list.length.toLocaleString();
+                document.getElementById(`tree-note-${loc}`).innerText = list.length
+                    ? (needCare ? `🔴 ต้องดูแลพิเศษ ${needCare} ต้น · นับจากชื่อต้นไม้ที่บันทึกไว้` : 'นับอัตโนมัติจากชื่อต้นไม้ที่บันทึกไว้')
+                    : 'ยังไม่มีชื่อต้นไม้ เพิ่มได้ที่หน้า "ข้อมูลต้นไม้"';
+            });
+
+            ['home', 'garden'].forEach(loc => {
+                const types = [ {id: 'rainfall', key: 'rf', label: 'ปริมาณน้ำฝน (mm)', color: '#4bc0c0'}, {id: 'soil_moisture', key: 'sm', label: 'ความชื้นในดิน (%)', color: '#36a2eb'}, {id: 'light_intensity', key: 'li', label: 'ความเข้มแสง (Lux)', color: '#ffce56'}, {id: 'soil_temp', key: 'st', label: 'อุณหภูมิดิน (°C)', color: '#ff6384'} ];
+                const viewWaterZone = document.getElementById(`view-water-zone-${loc}`).value;
+                types.push({id: `water_acc_${viewWaterZone}`, key: 'wa', label: `ปริมาณน้ำ จุดที่ ${viewWaterZone} (L)`, color: '#9966ff'});
+                types.forEach(type => {
+                    const savedData = getStorage(`sensor_${type.id}_${loc}`, false);
+                    let records = filterByMonth(savedData?.records, currentMonth);
+                    if (records && records.length > 0) updateChart(myCharts[`${type.key}-${loc}`], type.label, formatChartLabels(records), records.map(r => r.v), type.color);
+                    else updateChart(myCharts[`${type.key}-${loc}`], type.label, [], [], type.color);
+                });
+            });
+        };
+
+        // ---------- อ่านไฟล์ RainPoint ----------
+        const SENSOR_NAMES = { rainfall: 'ปริมาณน้ำฝน', soil_moisture: 'ความชื้นดิน', light_intensity: 'ความเข้มแสง', soil_temp: 'อุณหภูมิดิน' };
+        const sensorName = (type) => type.startsWith('water_acc_') ? `ปริมาณน้ำ จุดที่ ${type.split('_')[2]}` : (SENSOR_NAMES[type] || type);
+
+        // 1) ดูจากชื่อไฟล์ก่อน เช่น HCS021FRFSoilMoisture30Days_xxx.xlsx
+        function typeFromFileName(fileName, waterZone) {
+            const n = fileName.toLowerCase();
+            if (n.includes('humid')) return 'unsupported';
+            if (n.includes('moisture')) return 'soil_moisture';
+            if (n.includes('temp')) return 'soil_temp';
+            if (n.includes('rain') || n.includes('precip')) return 'rainfall';
+            if (n.includes('light') || n.includes('lux') || n.includes('illum')) return 'light_intensity';
+            if (/water|flow|usage|consum|irrig|volume/.test(n)) return `water_acc_${waterZone}`;
+            return '';
+        }
+        // 2) ถ้าชื่อไฟล์ไม่บอก ดูจากหน่วยในคอลัมน์ Value
+        function typeFromUnit(rows, waterZone) {
+            for (let i = 1; i < Math.min(30, rows.length); i++) {
+                const v = rows[i] && rows[i][1];
+                if (v == null || typeof v === 'number') continue;
+                const u = String(v).toUpperCase().replace(/[0-9.,\s-]/g, '');
+                if (!u) continue;
+                if (u.includes('LX') || u.includes('LUX')) return 'light_intensity';
+                if (u.includes('MM')) return 'rainfall';
+                if (u.includes('%')) return 'soil_moisture';
+                if (u.includes('℃') || u.includes('°') || u === 'C' || u === 'F') return 'soil_temp';
+                if (u === 'L' || u.startsWith('L') || u.includes('GAL')) return `water_acc_${waterZone}`;
+            }
+            return '';
+        }
+        // อ่านวันเวลาได้หลายรูปแบบ: 2026/08/28 00:00, 2026-08-28, 28/08/2026 00:00, หรือช่องวันที่ของ Excel
+        function parseTime(val) {
+            if (val instanceof Date) return isNaN(val) ? null : val.getTime();
+            if (typeof val === 'number') { const d = XLSX.SSF.parse_date_code(val); return d ? new Date(d.y, d.m - 1, d.d, d.H, d.M).getTime() : null; }
+            const s = String(val ?? '').trim();
+            let m = s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+            if (m) return new Date(+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0)).getTime();
+            m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})(?:[ T](\d{1,2}):(\d{2}))?/);
+            if (m) return new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0)).getTime();
+            const d = new Date(s); return isNaN(d) ? null : d.getTime();
+        }
+        const fmtDay = (t) => { const d = new Date(t); return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`; };
+
+        window.handleMultipleFileUpload = (event, loc) => {
+            const files = Array.from(event.target.files);
+            if (files.length === 0) return;
+            const waterZone = document.getElementById(`upload-water-zone-${loc}`).value;
+            const msgBox = document.getElementById(`upload-msg-${loc}`);
+            msgBox.innerHTML = '⏳ กำลังอ่านไฟล์...';
+            const lines = [];
+
+            // อ่านทีละไฟล์ตามลำดับ เพื่อให้ไฟล์ชนิดเดียวกันรวมกันได้ถูกต้อง
+            (async () => {
+                for (const file of files) {
+                    try {
+                        const buf = await file.arrayBuffer();
+                        const workbook = XLSX.read(buf, { type: 'array', cellDates: true });
+                        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, raw: true });
+                        let type = typeFromFileName(file.name, waterZone) || typeFromUnit(rows, waterZone);
+                        if (type === 'unsupported') { lines.push(`<span class="err">✖ ${esc(file.name)}: ความชื้นอากาศยังไม่มีกราฟรองรับ</span>`); continue; }
+                        if (!type) { lines.push(`<span class="err">✖ ${esc(file.name)}: ไม่รู้ว่าเป็นเซ็นเซอร์ชนิดไหน (ไม่พบคำในชื่อไฟล์ หรือหน่วย %, ℃, mm, Lx, L)</span>`); continue; }
+                        const r = await processData(rows, loc, type);
+                        if (!r) { lines.push(`<span class="err">✖ ${esc(file.name)}: ไม่พบข้อมูลเวลา/ค่าในไฟล์</span>`); continue; }
+                        if (!r.saved) { lines.push(`<span class="err">✖ ${esc(file.name)}: บันทึกขึ้น Cloud ไม่สำเร็จ</span>`); continue; }
+                        lines.push(`<span class="ok">✔ ${esc(file.name)} → ${sensorName(type)}: ${r.count.toLocaleString()} ค่า (${fmtDay(r.first)} – ${fmtDay(r.last)}), ใหม่ ${r.added.toLocaleString()} ค่า${r.updated ? `, ซ้ำ/อัปเดต ${r.updated.toLocaleString()} ค่า` : ''}</span>`);
+                    } catch (error) {
+                        lines.push(`<span class="err">✖ ${esc(file.name)}: อ่านไฟล์ไม่ได้ (${esc(error.message)})</span>`);
+                    }
+                }
+                msgBox.innerHTML = lines.join('<br>');
+                window.refreshAllUI();
+            })();
+            event.target.value = '';
+        };
+
+        // รวมข้อมูลใหม่เข้ากับของเดิม (ไม่ลบของเดิม) ถ้าเวลาเดียวกันซ้ำ ใช้ค่าจากไฟล์ใหม่
+        async function processData(rows, loc, type) {
+            let head = (rows[0] || []).map(x => String(x ?? '').toLowerCase());
+            const startRow = head.some(h => /time|date|เวลา|วันที่/.test(h)) ? 1 : 0;
+            const map = new Map();
+            let count = 0, first = Infinity, last = -Infinity;
+            for (let i = startRow; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row || row[0] == null || row[1] == null) continue;
+                const t = parseTime(row[0]);
+                const numValue = typeof row[1] === 'number' ? row[1] : Number(String(row[1]).replace(/[^0-9.-]/g, ''));
+                if (t == null || String(row[1]).trim() === '' || isNaN(numValue)) continue;
+                map.set(t, numValue); count++;
+                first = Math.min(first, t); last = Math.max(last, t);
+            }
+            if (count === 0) return null;
+
+            const key = `sensor_${type}_${loc}`;
+            const merged = new Map(asArray(getStorage(key, false)?.records).filter(r => r.t != null).map(r => [r.t, r.v]));
+            let added = 0, updated = 0;
+            map.forEach((v, t) => { if (merged.has(t)) updated++; else added++; merged.set(t, v); });
+            const records = Array.from(merged, ([t, v]) => ({ t, v })).sort((a, b) => a.t - b.t);
+            const saved = await saveStorage(key, { records });
+            return { saved, count, added, updated, first, last };
+        }
+
+        // สำรองข้อมูลทั้งหมดจาก Cloud เป็นไฟล์ .json เก็บไว้ในเครื่อง
+        window.downloadBackup = () => {
+            const d = new Date();
+            const name = `farm-backup-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.json`;
+            const blob = new Blob([JSON.stringify(cloudData, null, 1)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = name;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        function updateChart(chart, label, labels, data, color) {
+            chart.data.labels = labels; const dsIndex = chart.data.datasets.findIndex(ds => ds.label === label);
+            const isLine = chart.config.type === 'line'; const ctx = chart.canvas.getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, chart.canvas.height || 200);
+            gradient.addColorStop(0, hexToRgba(color, 0.5)); gradient.addColorStop(1, hexToRgba(color, 0.05));
+            const datasetConfig = { label: label, data: data, borderColor: color, backgroundColor: isLine ? gradient : hexToRgba(color, 0.8), borderWidth: isLine ? 2 : 0, fill: isLine, tension: 0.1, pointBackgroundColor: '#ffffff', pointBorderColor: color, pointBorderWidth: 2, pointRadius: data.length > 30 ? 0 : 3, pointHoverRadius: 5, borderRadius: isLine ? 0 : 4 };
+            if (dsIndex >= 0) chart.data.datasets[dsIndex] = datasetConfig; else chart.data.datasets.push(datasetConfig);
+            // กราฟเส้น: ให้แกน Y กว้างอย่างน้อย 10 หน่วย เพื่อไม่ให้การเปลี่ยนแปลงเล็กน้อย (เช่น 43→44%) ดูเหมือนขึ้นลงแรง
+            const nums = data.filter(v => typeof v === 'number' && !isNaN(v));
+            if (isLine && nums.length) {
+                const lo = Math.min(...nums), hi = Math.max(...nums), mid = (lo + hi) / 2, half = Math.max(5, (hi - lo) / 2);
+                chart.options.scales.y.suggestedMin = Math.floor(mid - half);
+                chart.options.scales.y.suggestedMax = Math.ceil(mid + half);
+                if (label.includes('%')) { chart.options.scales.y.min = Math.max(0, Math.floor(mid - half)); chart.options.scales.y.max = Math.min(100, Math.ceil(mid + half)); }
+            } else {
+                delete chart.options.scales.y.suggestedMin; delete chart.options.scales.y.suggestedMax;
+                delete chart.options.scales.y.min; delete chart.options.scales.y.max;
+            }
+            chart.update();
+        }
+
+        window.clearData = (type, loc) => {
+            const place = loc === 'home' ? 'บ้าน' : 'บ้านสวน';
+            let key = `sensor_${type}_${loc}`, name = sensorName(type);
+            if (type === 'water_acc') { const zone = document.getElementById(`view-water-zone-${loc}`).value; key = `sensor_water_acc_${zone}_${loc}`; name = `ปริมาณน้ำ จุดที่ ${zone}`; }
+            if (confirm(`⚠️ ลบข้อมูล "${name}" (${place}) ทั้งหมดทุกเดือนบน Cloud?\n\nกู้คืนไม่ได้ แนะนำให้กด "ดาวน์โหลดสำรองข้อมูล" ก่อน`)) {
+                deleteStorage(key);
+                window.refreshAllUI();
+            }
+        };
+
+        let currentFullscreenChartId = null;
+        window.openFullscreen = (chartId, title) => { const modal = document.getElementById('chart-modal'); const canvas = document.getElementById(`chart-${chartId}`); document.getElementById('modal-title').innerText = title; currentFullscreenChartId = chartId; document.getElementById('modal-body').appendChild(canvas); modal.style.display = 'flex'; myCharts[chartId].resize(); };
+        window.closeFullscreen = (event, forceClose = false) => { const modal = document.getElementById('chart-modal'); if (forceClose || (event && event.target === modal)) { if (currentFullscreenChartId) { const originalContainer = document.getElementById(`container-${currentFullscreenChartId}`); const canvas = document.getElementById(`chart-${currentFullscreenChartId}`); originalContainer.appendChild(canvas); modal.style.display = 'none'; myCharts[currentFullscreenChartId].resize(); currentFullscreenChartId = null; } } };
+
+        const getWeatherIcon = (code) => {
+            if (code === 0) return '☀️';
+            if (code === 1 || code === 2) return '⛅';
+            if (code === 3) return '☁️';
+            if (code >= 45 && code <= 48) return '🌫️';
+            if (code >= 51 && code <= 55) return '🌧️';
+            if (code >= 61 && code <= 67) return '🌧️';
+            if (code >= 71 && code <= 77) return '❄️';
+            if (code >= 80 && code <= 82) return '🌦️';
+            if (code >= 95 && code <= 99) return '⛈️';
+            return '🌤️';
+        };
+
+        const getWeatherDesc = (code) => {
+            if (code === 0) return 'ท้องฟ้าแจ่มใส';
+            if (code === 1 || code === 2) return 'มีเมฆบางส่วน';
+            if (code === 3) return 'มืดครึ้ม';
+            if (code >= 45 && code <= 48) return 'มีหมอก';
+            if (code >= 51 && code <= 55) return 'ฝนตกปรอยๆ';
+            if (code >= 61 && code <= 67) return 'ฝนตก';
+            if (code >= 71 && code <= 77) return 'หิมะตก';
+            if (code >= 80 && code <= 82) return 'ฝนตกหนัก';
+            if (code >= 95 && code <= 99) return 'พายุฝนฟ้าคะนอง';
+            return 'ปกติ';
+        };
+
+        const formatTimeFromIso = (isoString) => {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            return `(${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')})`;
+        };
+
+        async function initWeather() {
+            // 🔥 ฝังพิกัด GPS จริงตามที่ได้รับมอบหมาย
+            // ใช้พิกัดโดยประมาณ (ทศนิยม 2 ตำแหน่ง ≈ 1 กม.) พอสำหรับพยากรณ์อากาศ และไม่เปิดเผยตำแหน่งบ้านที่แน่นอน
+            const latHome = 13.74, lonHome = 100.71;
+            const latGarden = 12.70, lonGarden = 99.76;
+
+            const fetchW = async (loc, lat, lon) => {
+                try {
+                    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&hourly=temperature_2m&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FBangkok`);
+                    const data = await res.json();
+
+                    document.getElementById(`temp-current-${loc}`).innerText = Math.round(data.current.temperature_2m);
+                    document.getElementById(`weather-icon-${loc}`).innerText = getWeatherIcon(data.current.weather_code);
+                    document.getElementById(`weather-desc-${loc}`).innerText = getWeatherDesc(data.current.weather_code);
+
+                    const maxTemp = data.daily.temperature_2m_max[0];
+                    const minTemp = data.daily.temperature_2m_min[0];
+                    document.getElementById(`temp-max-${loc}`).innerText = Math.round(maxTemp);
+                    document.getElementById(`temp-min-${loc}`).innerText = Math.round(minTemp);
+
+                    let maxTimeIndex = 0;
+                    let minTimeIndex = 0;
+                    let currentMax = -999;
+                    let currentMin = 999;
+
+                    for(let i=0; i<24; i++) {
+                        if(data.hourly.temperature_2m[i] > currentMax) {
+                            currentMax = data.hourly.temperature_2m[i];
+                            maxTimeIndex = i;
+                        }
+                        if(data.hourly.temperature_2m[i] < currentMin) {
+                            currentMin = data.hourly.temperature_2m[i];
+                            minTimeIndex = i;
+                        }
+                    }
+
+                    document.getElementById(`time-max-${loc}`).innerText = formatTimeFromIso(data.hourly.time[maxTimeIndex]);
+                    document.getElementById(`time-min-${loc}`).innerText = formatTimeFromIso(data.hourly.time[minTimeIndex]);
+
+                } catch(e) {
+                    console.error('Weather error:', e);
+                    document.getElementById(`weather-desc-${loc}`).innerText = 'ไม่สามารถดึงข้อมูลได้';
+                }
+            };
+
+            fetchW('home', latHome, lonHome);
+            fetchW('garden', latGarden, lonGarden);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            initWeather();
+        });
+    </script>
+</body>
+</html>
