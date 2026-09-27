@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Dashboard (Advanced Analytics)</title>
+    <!-- เพิ่มลงหน้าจอโฮมของมือถือได้ เปิดแล้วเหมือนแอป -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="ฟาร์ม">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- ล็อกเวอร์ชัน Chart.js ไว้ ป้องกันกราฟพังเมื่อมีเวอร์ชันใหม่ -->
@@ -108,7 +117,43 @@
         .status-ปกติ { background: #fff3cd; color: #856404; }
         .status-ออกดอก { background: #f1f3f5; color: #495057; }
         .status-ต้องดูแล { background: #f8d7da; color: #721c24; }
-        @media (max-width: 768px) { .management-container { flex-direction: column; } .top-nav { justify-content: center; } .month-picker-container { margin: 10px auto; } }
+        /* ปุ่มสลับ บ้าน | บ้านสวน (แสดงเฉพาะบนมือถือ) */
+        .site-switch { display: none; background: #333; border-radius: 8px; padding: 3px; gap: 3px; }
+        .site-switch button { background: none; color: #ccc; border: none; padding: 7px 14px; border-radius: 6px; font-size: 1em; font-weight: bold; cursor: pointer; white-space: nowrap; font-family: inherit; }
+        .site-switch button.on { background: #28a745; color: white; }
+        .site-switch button.on[data-site="garden"] { background: #0056b3; }
+
+        /* การ์ดเปรียบเทียบ */
+        .compare-table { width: 100%; border-collapse: collapse; font-size: 0.92em; }
+        .compare-table th, .compare-table td { padding: 8px 6px; border-bottom: 1px solid #eee; text-align: right; white-space: nowrap; }
+        .compare-table th:first-child, .compare-table td:first-child { text-align: left; white-space: normal; }
+        .compare-table th { font-size: 0.85em; color: #777; font-weight: 600; }
+        .compare-table td.now { font-weight: bold; color: #222; }
+        .chg { display: block; font-size: 0.8em; font-weight: normal; color: #777; }
+        .chg.up::before { content: '▲ '; } .chg.down::before { content: '▼ '; }
+        .compare-note { font-size: 0.8em; color: #888; margin: 10px 0 0 0; }
+        .compare-scroll { overflow-x: auto; }
+
+        @media (max-width: 768px) {
+            .management-container { flex-direction: column; }
+            /* แถบเมนูเลื่อนซ้าย-ขวาได้ ไม่กินพื้นที่จอ */
+            .top-nav { flex-wrap: nowrap; overflow-x: auto; padding: 8px; gap: 6px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+            .top-nav::-webkit-scrollbar { display: none; }
+            .tab-btn { padding: 8px 12px; font-size: 0.95em; }
+            .month-picker-container { margin: 0; padding: 4px 10px; white-space: nowrap; }
+            .site-switch { display: flex; flex-shrink: 0; order: -2; }
+            .month-picker-container { order: -1; }
+            /* แสดงทีละพื้นที่ */
+            body.show-home .management-container > .split-screen:nth-child(2),
+            body.show-garden .management-container > .split-screen:nth-child(1) { display: none; }
+            .split-screen { padding: 16px 12px; border-right: none !important; }
+            h1 { font-size: 1.9em; margin-top: 0; }
+            .card { padding: 16px; margin-bottom: 16px; border-radius: 12px; }
+            .tree-page-container { padding: 12px; }
+            .tree-form-container { padding: 16px; }
+            .upload-row { flex-direction: column; }
+            .modal-content { width: 96%; height: 70%; padding: 12px; }
+        }
     </style>
 </head>
 <body>
@@ -133,6 +178,10 @@
         </div>
 
         <div class="top-nav">
+            <div class="site-switch" role="group" aria-label="เลือกพื้นที่">
+                <button data-site="home" onclick="window.setSite('home')">บ้าน</button>
+                <button data-site="garden" onclick="window.setSite('garden')">บ้านสวน</button>
+            </div>
             <button class="tab-btn active" onclick="window.switchTab('page1', this)">📋 หน้าจัดการงาน & สรุปผล</button>
             <button class="tab-btn" onclick="window.switchTab('page2', this)">🌱 ข้อมูลเซ็นเซอร์ (ละเอียด)</button>
             <button class="tab-btn" onclick="window.switchTab('page3', this)">🌳 ข้อมูลต้นไม้ (บ้าน)</button>
@@ -197,6 +246,13 @@
                         <div class="chart-container mini-chart"><canvas id="chart-yearly-rf-home"></canvas></div>
                         <h4 style="margin: 15px 0 5px 0; color: #0056b3;">💦 ปริมาณน้ำใช้สะสมรายเดือน (ตลอดปี)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-yearly-wa-home"></canvas></div>
+                    </div>
+
+                    <!-- 📈 เปรียบเทียบกับเดือนก่อน / ปีที่แล้ว -->
+                    <div class="card">
+                        <h3 style="display:block; margin-bottom: 10px;">📈 เปรียบเทียบ</h3>
+                        <div class="compare-scroll" id="compare-home"></div>
+                        <p class="compare-note">▲ = เดือนที่เลือกมากกว่า · ▼ = น้อยกว่า · น้ำใช้รวมทุกจุด</p>
                     </div>
 
                     <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ -->
@@ -278,6 +334,13 @@
                         <div class="chart-container mini-chart"><canvas id="chart-yearly-rf-garden"></canvas></div>
                         <h4 style="margin: 15px 0 5px 0; color: #28a745;">💦 ปริมาณน้ำใช้สะสมรายเดือน (ตลอดปี)</h4>
                         <div class="chart-container mini-chart"><canvas id="chart-yearly-wa-garden"></canvas></div>
+                    </div>
+
+                    <!-- 📈 เปรียบเทียบกับเดือนก่อน / ปีที่แล้ว -->
+                    <div class="card">
+                        <h3 style="display:block; margin-bottom: 10px;">📈 เปรียบเทียบ</h3>
+                        <div class="compare-scroll" id="compare-garden"></div>
+                        <p class="compare-note">▲ = เดือนที่เลือกมากกว่า · ▼ = น้อยกว่า · น้ำใช้รวมทุกจุด</p>
                     </div>
 
                     <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ -->
@@ -661,6 +724,23 @@
             btnElement.classList.add('active');
             Object.values(myCharts).forEach(chart => chart.resize());
         };
+        // มือถือ: เลือกดูทีละพื้นที่ (จำค่าไว้ในเครื่อง)
+        window.setSite = (site) => {
+            document.body.classList.toggle('show-home', site === 'home');
+            document.body.classList.toggle('show-garden', site === 'garden');
+            document.querySelectorAll('.site-switch button').forEach(b => b.classList.toggle('on', b.dataset.site === site));
+            try { localStorage.setItem('smartFarm_site', site); } catch (e) {}
+            // ถ้ากำลังเปิดหน้าต้นไม้ ให้สลับไปหน้าต้นไม้ของพื้นที่ที่เลือก
+            const treePages = { home: 'page3', garden: 'page4' };
+            const activePage = document.querySelector('.page-content.active');
+            if (activePage && (activePage.id === 'page3' || activePage.id === 'page4') && activePage.id !== treePages[site]) {
+                const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => (b.getAttribute('onclick') || '').includes(`'${treePages[site]}'`));
+                if (btn) window.switchTab(treePages[site], btn);
+            }
+            Object.values(myCharts).forEach(chart => chart.resize());
+        };
+        (() => { let s = 'home'; try { s = localStorage.getItem('smartFarm_site') || 'home'; } catch (e) {} document.addEventListener('DOMContentLoaded', () => window.setSite(s)); })();
+
         window.toggleForm = (id) => { const el = document.getElementById(id); el.style.display = (el.style.display === "none" || el.style.display === "") ? "flex" : "none"; };
 
         function filterByMonth(records, selectedMonth) {
@@ -695,20 +775,86 @@
             const recordsRF_month = filterByMonth(rfData?.records, currentMonth);
             setStat(`sum-rf-val-${loc}`, recordsRF_month.length > 0 ? recordsRF_month.reduce((sum, r) => sum + r.v, 0).toFixed(1) : null);
 
-            let rfYearlySums = Array(12).fill(0);
-            if (rfData && rfData.records) { asArray(rfData.records).forEach(r => { const d = new Date(r.t); if (d.getFullYear().toString() === currentYear) rfYearlySums[d.getMonth()] += r.v; }); }
-            updateChart(myCharts[`yearly-rf-${loc}`], `น้ำฝนสะสมปี ${currentYear} (mm)`, monthsLabel, rfYearlySums.map(v => parseFloat(v.toFixed(1))), '#17a2b8');
-
-            let waYearlySums = Array(12).fill(0);
-            if (waterData && waterData.records) { asArray(waterData.records).forEach(r => { const d = new Date(r.t); if (d.getFullYear().toString() === currentYear) waYearlySums[d.getMonth()] += r.v; }); }
-            updateChart(myCharts[`yearly-wa-${loc}`], `น้ำใช้สะสมปี ${currentYear} (L)`, monthsLabel, waYearlySums.map(v => parseFloat(v.toFixed(1))), loc === 'home' ? '#0056b3' : '#28a745');
+            updateYearlyChart(myCharts[`yearly-rf-${loc}`], [rfData], +currentYear, 'mm', '#17a2b8');
+            updateYearlyChart(myCharts[`yearly-wa-${loc}`], [waterData], +currentYear, 'L', loc === 'home' ? '#0056b3' : '#28a745');
 
             const smData = getStorage(`sensor_soil_moisture_${loc}`, false);
             updateChart(myCharts[`avg-sm-${loc}`], 'ความชื้นเฉลี่ย (%)', hours24, calcHourlyProfile(filterByMonth(smData?.records, currentMonth)), '#36a2eb');
 
             const stData = getStorage(`sensor_soil_temp_${loc}`, false);
             updateChart(myCharts[`avg-st-${loc}`], 'อุณหภูมิเฉลี่ย (°C)', hours24, calcHourlyProfile(filterByMonth(stData?.records, currentMonth)), '#ff6384');
+
+            renderCompare(loc, currentMonth);
         };
+
+        // ---------- เปรียบเทียบข้ามเดือน / ข้ามปี ----------
+        const TH_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+        const monthLabel = (ym) => { const [y, m] = ym.split('-').map(Number); return `${TH_MONTHS[m-1]} ${String(y + 543).slice(2)}`; };
+        const shiftMonth = (ym, n) => { const [y, m] = ym.split('-').map(Number); const d = new Date(y, m - 1 + n, 1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; };
+
+        function monthStats(loc, ym) {
+            const recs = (key) => filterByMonth(getStorage(key, false)?.records, ym);
+            const sum = (a) => a.length ? a.reduce((x, r) => x + r.v, 0) : null;
+            const avg = (a) => a.length ? a.reduce((x, r) => x + r.v, 0) / a.length : null;
+            // น้ำ: รวมทุกจุดในแต่ละวัน แล้วเฉลี่ยต่อวัน (เทียบได้แม้เดือนนี้ยังไม่ครบเดือน)
+            const perDay = {};
+            ['1','2','3'].forEach(z => recs(`sensor_water_acc_${z}_${loc}`).forEach(r => { const d = new Date(r.t).toDateString(); perDay[d] = (perDay[d] || 0) + r.v; }));
+            const days = Object.values(perDay);
+            return {
+                water: days.length ? days.reduce((a, b) => a + b, 0) / days.length : null,
+                rain: sum(recs(`sensor_rainfall_${loc}`)),
+                sm: avg(recs(`sensor_soil_moisture_${loc}`)),
+                st: avg(recs(`sensor_soil_temp_${loc}`)),
+            };
+        }
+
+        function renderCompare(loc, ym) {
+            const box = document.getElementById(`compare-${loc}`);
+            if (!box || !ym) return;
+            const cols = [ym, shiftMonth(ym, -1), shiftMonth(ym, -12)];
+            const stats = cols.map(c => monthStats(loc, c));
+            const rows = [
+                { k: 'water', name: '💦 น้ำใช้เฉลี่ย', unit: 'L/วัน', dp: 0, pct: true },
+                { k: 'rain', name: '🌧️ น้ำฝนรวม', unit: 'mm', dp: 1, pct: true },
+                { k: 'sm', name: '💧 ความชื้นดินเฉลี่ย', unit: '%', dp: 1, pct: false },
+                { k: 'st', name: '🌡️ อุณหภูมิดินเฉลี่ย', unit: '°C', dp: 1, pct: false },
+            ];
+            const fmt = (v, dp) => v === null ? '–' : Number(v).toLocaleString('th-TH', { maximumFractionDigits: dp });
+            // แสดงผลต่าง: น้ำ/ฝน เป็น %, ความชื้น/อุณหภูมิ เป็นหน่วยจริง
+            const change = (now, old, r) => {
+                if (now === null || old === null) return '';
+                const diff = now - old;
+                if (Math.abs(diff) < 0.05) return '<span class="chg">เท่าเดิม</span>';
+                const cls = diff > 0 ? 'up' : 'down', word = diff > 0 ? 'เดือนนี้มากกว่า' : 'เดือนนี้น้อยกว่า';
+                const txt = r.pct ? (old === 0 ? `+${fmt(diff, r.dp)} ${r.unit}` : `${Math.abs(diff / old * 100).toFixed(0)}%`) : `${fmt(Math.abs(diff), 1)} ${r.unit}`;
+                return `<span class="chg ${cls}" title="${word}">${txt}</span>`;
+            };
+            const anyData = stats.some(st => Object.values(st).some(v => v !== null));
+            if (!anyData) { box.innerHTML = '<p style="color:#999; margin:0;">ยังไม่มีข้อมูลให้เปรียบเทียบ</p>'; return; }
+            box.innerHTML = `<table class="compare-table"><thead><tr><th></th><th>${monthLabel(cols[0])}</th><th>เดือนก่อน<br>${monthLabel(cols[1])}</th><th>ปีที่แล้ว<br>${monthLabel(cols[2])}</th></tr></thead><tbody>${
+                rows.map(r => {
+                    const [a, b, c] = stats.map(st => st[r.k]);
+                    return `<tr><td>${r.name} <span style="color:#999;font-size:0.85em">(${r.unit})</span></td><td class="now">${fmt(a, r.dp)}</td><td>${fmt(b, r.dp)}${change(a, b, r)}</td><td>${fmt(c, r.dp)}${change(a, c, r)}</td></tr>`;
+                }).join('')
+            }</tbody></table>`;
+        }
+
+        // กราฟรายเดือนทั้งปี: ปีนี้ เทียบกับ ปีที่แล้ว
+        function updateYearlyChart(chart, sources, year, unit, color) {
+            const sums = (y) => {
+                const arr = Array(12).fill(0); let has = false;
+                sources.forEach(src => asArray(src?.records).forEach(r => { const d = new Date(r.t); if (d.getFullYear() === y) { arr[d.getMonth()] += r.v; has = true; } }));
+                return has ? arr.map(v => parseFloat(v.toFixed(1))) : null;
+            };
+            const cur = sums(year), prev = sums(year - 1);
+            chart.data.labels = TH_MONTHS;
+            chart.data.datasets = [];
+            if (prev) chart.data.datasets.push({ label: `ปี ${year + 542} (${unit})`, data: prev, backgroundColor: 'rgba(160,160,160,0.45)', borderRadius: 4, borderWidth: 0 });
+            chart.data.datasets.push({ label: `ปี ${year + 543} (${unit})`, data: cur || Array(12).fill(0), backgroundColor: hexToRgba(color, 0.85), borderRadius: 4, borderWidth: 0 });
+            chart.options.plugins.legend.display = !!prev;
+            chart.options.plugins.legend.labels = { boxWidth: 12, font: { size: 11 } };
+            chart.update();
+        }
 
         // ================= To-Do System =================
         function renderTodos(loc) {
