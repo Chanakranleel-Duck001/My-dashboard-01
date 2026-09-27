@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Dashboard (Advanced Analytics)</title>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ล็อกเวอร์ชัน Chart.js ไว้ ป้องกันกราฟพังเมื่อมีเวอร์ชันใหม่ -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
     <style>
         body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; color: #333; }
-        
+
         #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1ae6; z-index: 10000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .login-box { background: white; padding: 40px; border-radius: 16px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         .login-box h2 { margin-top: 0; color: #333; font-size: 1.8em; margin-bottom: 25px; }
@@ -26,50 +27,50 @@
         .tab-btn { background: #333; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-size: 1.05em; cursor: pointer; transition: 0.3s; white-space: nowrap;}
         .tab-btn.active { background: #28a745; font-weight: bold; }
         .tab-btn:hover { background: #444; }
-        
+
         .month-picker-container { display: flex; align-items: center; gap: 8px; background: #444; padding: 5px 15px; border-radius: 8px; color: white; margin-left: auto; font-weight: bold;}
         .month-picker-container input { padding: 5px; border-radius: 5px; border: none; font-family: inherit; }
-        
+
         .logout-btn { background: #dc3545; }
         .logout-btn:hover { background: #c82333; }
-        
+
         .page-content { display: none; }
         .page-content.active { display: block; }
-        
+
         .management-container { display: flex; min-height: 90vh; }
         .split-screen { flex: 1; padding: 40px 20px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; overflow-y: auto; }
         .split-screen:first-child { border-right: 2px solid #e0e0e0; background-color: #ffffff; }
         .split-screen:last-child { background-color: #f8fafc; }
         h1 { color: #1a1a1a; margin-bottom: 5px; font-size: 2.5em; text-align: center;}
-        
+
         .card { background: white; width: 100%; max-width: 500px; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid #f0f0f0; box-sizing: border-box; position: relative;}
         .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f2f5; padding-bottom: 12px; margin-bottom: 15px;}
         .card h3 { margin: 0; color: #4a4a4a; font-size: 1.2em; display: flex; align-items: center; justify-content: space-between; width: 100%;}
-        
+
         .todo-list, .expense-list { list-style-type: none; padding: 0; margin: 0; }
         .todo-list li, .expense-list li { padding: 12px 0; border-bottom: 1px dashed #e0e0e0; display: flex; align-items: center; flex-wrap: wrap;}
         .todo-list input[type="checkbox"] { margin-right: 12px; transform: scale(1.2); cursor: pointer; }
         .task-text { flex: 1; }
         .completed span.task-text { text-decoration: line-through; color: #999; }
-        
+
         .due-date { font-size: 0.85em; background: #e9ecef; padding: 2px 8px; border-radius: 10px; margin-left: 10px; display: inline-flex; align-items: center; gap: 5px;}
         .add-form { display: none; margin-bottom: 15px; flex-direction: column; gap: 8px; background: #f8fafc; padding: 10px; border-radius: 8px;}
         .add-form input, .add-form select { padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit;}
         .add-form button { padding: 8px; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight:bold;}
         .toggle-btn { background: #e6f2ff; color: #0056b3; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 1.2em; cursor: pointer;}
-        
+
         .stat-card { text-align: center; border-bottom: 4px solid #28a745; background: #f8fff9;}
         .stat-card.garden { border-bottom-color: #0056b3; background: #f4f9ff;}
         .stat-card .number { font-size: 3em; font-weight: bold; color: #28a745; margin: 10px 0 0 0;}
         .stat-card.garden .number { color: #0056b3; }
-        
+
         .upload-row { display: flex; gap: 10px; margin-bottom: 10px;}
         .upload-row select { flex: 1; }
         .upload-row input[type="file"] { flex: 2; padding: 5px; }
-        
+
         .chart-container { position: relative; height: 240px; width: 100%; margin-top: 15px; }
         .mini-chart { height: 140px; margin-bottom: 20px;}
-        
+
         .action-btns { display: flex; gap: 5px;}
         .clear-chart-btn { font-size: 0.8em; background: #ffebee; color: #d32f2f; border: 1px solid #ef9a9a; border-radius: 4px; padding: 3px 8px; cursor: pointer;}
         .fullscreen-btn { font-size: 0.8em; background: #e3f2fd; color: #1976d2; border: 1px solid #bbdefb; border-radius: 4px; padding: 3px 8px; cursor: pointer;}
@@ -82,19 +83,31 @@
         .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
         .input-grid input, .input-grid select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-family: inherit; font-size: 1em; width: 100%; box-sizing: border-box;}
         .full-width-btn { padding: 12px 20px; background-color: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1em; width: 100%; transition: 0.3s;}
-        
+
         .search-box { width: 100%; padding: 15px; border-radius: 10px; border: 2px solid #e0e0e0; font-size: 1.1em; margin-bottom: 25px; box-sizing: border-box; transition: 0.3s; }
         .search-box:focus { outline: none; border-color: #28a745; box-shadow: 0 0 8px rgba(40,167,69,0.2); }
 
         .tree-grid { display: flex; flex-wrap: wrap; gap: 20px; }
         .tree-card { flex: 1 1 300px; max-width: 100%; background: white; border-radius: 16px; padding: 20px; border: 1px solid #e0e0e0; position: relative; border-left: 5px solid #28a745;}
-        
+
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; height: 80%; position: relative; display: flex; flex-direction: column; }
         .modal-content h3 { margin-top: 0; color: #333; text-align: center;}
         .modal-body { flex: 1; position: relative; }
         .close-modal-btn { position: absolute; top: 10px; right: 15px; font-size: 1.5em; cursor: pointer; color: #888; background: none; border: none; }
-        
+
+        .no-data { color: #999 !important; font-size: 0.6em !important; }
+        .stat-note { font-size: 0.8em; color: #777; margin: 4px 0 0 0; }
+        .upload-msg { font-size: 0.9em; margin-top: 8px; line-height: 1.5; }
+        .upload-msg .ok { color: #28a745; } .upload-msg .err { color: #d32f2f; }
+        .zone-row { display: flex; align-items: center; gap: 8px; font-size: 0.9em; color: #555; margin-bottom: 8px; flex-wrap: wrap; }
+        .zone-row select { padding: 4px 6px; border-radius: 6px; border: 1px solid #9966ff; }
+        .backup-btn { font-size: 0.9em; background: #f1f3f5; color: #333; border: 1px solid #ced4da; border-radius: 6px; padding: 6px 12px; cursor: pointer; margin-top: 8px; }
+        .status-badge { padding: 2px 10px; border-radius: 10px; font-size: 0.9em; background: #e9ecef; }
+        .status-ดีเยี่ยม { background: #d4edda; color: #155724; }
+        .status-ปกติ { background: #fff3cd; color: #856404; }
+        .status-ออกดอก { background: #f1f3f5; color: #495057; }
+        .status-ต้องดูแล { background: #f8d7da; color: #721c24; }
         @media (max-width: 768px) { .management-container { flex-direction: column; } .top-nav { justify-content: center; } .month-picker-container { margin: 10px auto; } }
     </style>
 </head>
@@ -124,11 +137,11 @@
             <button class="tab-btn" onclick="window.switchTab('page2', this)">🌱 ข้อมูลเซ็นเซอร์ (ละเอียด)</button>
             <button class="tab-btn" onclick="window.switchTab('page3', this)">🌳 ข้อมูลต้นไม้ (บ้าน)</button>
             <button class="tab-btn" onclick="window.switchTab('page4', this)">🌲 ข้อมูลต้นไม้ (บ้านสวน)</button>
-            
+
             <div class="month-picker-container">
                 📅 เลือกเดือน: <input type="month" id="global-month" onchange="window.refreshAllUI()">
             </div>
-            
+
             <button class="tab-btn logout-btn" onclick="window.handleLogout()">🚪 ออกจากระบบ</button>
         </div>
 
@@ -138,7 +151,7 @@
                 <!-- ฝั่งบ้าน -->
                 <div class="split-screen">
                     <h1>บ้าน</h1>
-                    
+
                     <div class="card" style="background: linear-gradient(135deg, #3a7bd5, #3a6073); color: white; border: none; padding: 20px;">
                         <h3 style="color: white; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; display: flex; justify-content: space-between;">
                             <span>📍 สภาพอากาศวันนี้</span>
@@ -164,7 +177,7 @@
                         <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 20px; text-align: center; gap: 10px;">
                             <div style="flex: 1; min-width: 140px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                                 <p style="font-size: 0.95em; font-weight: bold; margin: 0 0 5px 0; color:#0056b3;">
-                                    💦 เฉลี่ยปริมาณน้ำ 
+                                    💦 เฉลี่ยปริมาณน้ำ
                                     <select id="avg-water-zone-home" onchange="window.updatePage1Averages('home')" style="padding: 2px; border-radius: 4px; font-size: 0.85em; border: 1px solid #ccc;">
                                         <option value="1">จุด 1</option><option value="2">จุด 2</option><option value="3">จุด 3</option>
                                     </select>
@@ -219,7 +232,7 @@
                 <!-- ฝั่งบ้านสวน -->
                 <div class="split-screen">
                     <h1>บ้านสวน</h1>
-                    
+
                     <div class="card" style="background: linear-gradient(135deg, #134e5e, #71b280); color: white; border: none; padding: 20px;">
                         <h3 style="color: white; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; display: flex; justify-content: space-between;">
                             <span>📍 สภาพอากาศวันนี้</span>
@@ -245,7 +258,7 @@
                         <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 20px; text-align: center; gap: 10px;">
                             <div style="flex: 1; min-width: 140px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                                 <p style="font-size: 0.95em; font-weight: bold; margin: 0 0 5px 0; color:#28a745;">
-                                    💦 เฉลี่ยปริมาณน้ำ 
+                                    💦 เฉลี่ยปริมาณน้ำ
                                     <select id="avg-water-zone-garden" onchange="window.updatePage1Averages('garden')" style="padding: 2px; border-radius: 4px; font-size: 0.85em; border: 1px solid #ccc;">
                                         <option value="1">จุด 1</option><option value="2">จุด 2</option><option value="3">จุด 3</option>
                                     </select>
@@ -305,18 +318,23 @@
                 <div class="split-screen">
                     <h1>บ้าน (Sensors)</h1>
                     <div class="card stat-card">
-                        <h3 style="display: flex;">🌳 ยอดรวมต้นไม้ <div class="action-btns"><button class="clear-chart-btn" onclick="window.clearData('tree_count', 'home')">🗑️ ล้าง</button></div></h3>
+                        <h3 style="display: flex;">🌳 ยอดรวมต้นไม้</h3>
                         <p class="number" id="tree-home">0</p>
+                        <p class="stat-note" id="tree-note-home">นับอัตโนมัติจากชื่อต้นไม้ที่บันทึกไว้</p>
                     </div>
                     <div class="card">
                         <h3 style="display:block; margin-bottom: 10px;">📥 อัปโหลดข้อมูลขึ้น Cloud</h3>
                         <div class="upload-row">
                             <select id="data-type-home">
                                 <option value="auto">🤖 แยกข้อมูลอัตโนมัติ (RainPoint)</option>
-                                <option value="tree_count">🌳 อัปเดตยอดรวมต้นไม้</option>
                             </select>
-                            <input type="file" multiple accept=".xlsx, .xls" onchange="window.handleMultipleFileUpload(event, 'home')">
+                            <input type="file" multiple accept=".xlsx, .xls, .csv" onchange="window.handleMultipleFileUpload(event, 'home')">
                         </div>
+                        <div class="zone-row">💦 ถ้าเป็นไฟล์ปริมาณน้ำ บันทึกเป็น
+                            <select id="upload-water-zone-home"><option value="1">จุดที่ 1</option><option value="2">จุดที่ 2</option><option value="3">จุดที่ 3</option></select>
+                        </div>
+                        <div class="upload-msg" id="upload-msg-home"></div>
+                        <button class="backup-btn" onclick="window.downloadBackup()">💾 ดาวน์โหลดสำรองข้อมูลทั้งหมด (.json)</button>
                     </div>
 
                     <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ (หน้า 2 - ซิงค์กับหน้า 1) -->
@@ -335,7 +353,7 @@
 
                     <div class="card" id="card-wa-home">
                         <h3>
-                            <span>🪣 ปริมาณน้ำ (L) 
+                            <span>🪣 ปริมาณน้ำ (L)
                                 <select id="view-water-zone-home" onchange="window.loadSavedSensorData()" style="font-size: 0.8em; padding: 2px; border-radius: 5px; margin-left: 5px; border: 1px solid #9966ff;">
                                     <option value="1">จุดที่ 1</option><option value="2">จุดที่ 2</option><option value="3">จุดที่ 3</option>
                                 </select>
@@ -365,18 +383,23 @@
                 <div class="split-screen">
                     <h1>บ้านสวน (Sensors)</h1>
                     <div class="card stat-card garden">
-                        <h3 style="display: flex;">🌲 ยอดรวมต้นไม้ <div class="action-btns"><button class="clear-chart-btn" onclick="window.clearData('tree_count', 'garden')">🗑️ ล้าง</button></div></h3>
+                        <h3 style="display: flex;">🌲 ยอดรวมต้นไม้</h3>
                         <p class="number" id="tree-garden">0</p>
+                        <p class="stat-note" id="tree-note-garden">นับอัตโนมัติจากชื่อต้นไม้ที่บันทึกไว้</p>
                     </div>
                     <div class="card">
                         <h3 style="display:block; margin-bottom: 10px;">📥 อัปโหลดข้อมูลขึ้น Cloud</h3>
                         <div class="upload-row">
                             <select id="data-type-garden">
                                 <option value="auto">🤖 แยกข้อมูลอัตโนมัติ (RainPoint)</option>
-                                <option value="tree_count">🌳 อัปเดตยอดรวมต้นไม้</option>
                             </select>
-                            <input type="file" multiple accept=".xlsx, .xls" onchange="window.handleMultipleFileUpload(event, 'garden')">
+                            <input type="file" multiple accept=".xlsx, .xls, .csv" onchange="window.handleMultipleFileUpload(event, 'garden')">
                         </div>
+                        <div class="zone-row">💦 ถ้าเป็นไฟล์ปริมาณน้ำ บันทึกเป็น
+                            <select id="upload-water-zone-garden"><option value="1">จุดที่ 1</option><option value="2">จุดที่ 2</option><option value="3">จุดที่ 3</option></select>
+                        </div>
+                        <div class="upload-msg" id="upload-msg-garden"></div>
+                        <button class="backup-btn" onclick="window.downloadBackup()">💾 ดาวน์โหลดสำรองข้อมูลทั้งหมด (.json)</button>
                     </div>
 
                     <!-- ⚠️ การ์ดหมายเหตุ/เหตุการณ์ผิดปกติ (หน้า 2 - ซิงค์กับหน้า 1) -->
@@ -395,7 +418,7 @@
 
                     <div class="card" id="card-wa-garden">
                         <h3>
-                            <span>🪣 ปริมาณน้ำ (L) 
+                            <span>🪣 ปริมาณน้ำ (L)
                                 <select id="view-water-zone-garden" onchange="window.loadSavedSensorData()" style="font-size: 0.8em; padding: 2px; border-radius: 5px; margin-left: 5px; border: 1px solid #9966ff;">
                                     <option value="1">จุดที่ 1</option><option value="2">จุดที่ 2</option><option value="3">จุดที่ 3</option>
                                 </select>
@@ -452,7 +475,7 @@
                         </div>
                     </div>
                     <button class="full-width-btn" onclick="window.addIndividualTree('home')">➕ บันทึกข้อมูลทีละรายการ</button>
-                    
+
                     <div class="form-section upload-section" style="margin-top: 15px;">
                         <h4 style="margin-bottom: 5px;">📥 อัปโหลดข้อมูลจาก Excel (เพิ่มทีเดียวทั้งหมด)</h4>
                         <div style="font-size: 0.85em; color: #555; margin-bottom: 10px;">
@@ -494,7 +517,7 @@
                         </div>
                     </div>
                     <button class="full-width-btn" onclick="window.addIndividualTree('garden')">➕ บันทึกข้อมูลทีละรายการ</button>
-                    
+
                     <div class="form-section upload-section" style="margin-top: 15px;">
                         <h4 style="margin-bottom: 5px;">📥 อัปโหลดข้อมูลจาก Excel (เพิ่มทีเดียวทั้งหมด)</h4>
                         <div style="font-size: 0.85em; color: #555; margin-bottom: 10px;">
@@ -540,9 +563,9 @@
 
         let myUid = null;
         let cloudData = {};
-        
+
         let inactivityTimer;
-        const IDLE_TIMEOUT = 15 * 60 * 1000; 
+        const IDLE_TIMEOUT = 15 * 60 * 1000;
 
         function resetTimer() {
             if (!myUid) return;
@@ -584,25 +607,46 @@
                 myUid = user.uid;
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
-                
+
                 onValue(ref(db, 'shared_farm_data'), (snapshot) => {
                     cloudData = snapshot.val() || {};
                     window.refreshAllUI();
                 });
-                resetTimer(); 
+                resetTimer();
             } else {
                 myUid = null;
-                clearTimeout(inactivityTimer); 
+                clearTimeout(inactivityTimer);
                 localStorage.removeItem('smartFarm_lastActive');
             }
         });
 
         function getStorage(key, isArray = true) { return cloudData[key] !== undefined ? cloudData[key] : (isArray ? [] : null); }
-        function saveStorage(key, data) { if(myUid) set(ref(db, `shared_farm_data/${key}`), data); }
-        function deleteStorage(key) { if(myUid) remove(ref(db, `shared_farm_data/${key}`)); }
+        // อัปเดตข้อมูลในเครื่องทันที (อัปโหลดหลายไฟล์ติดกันจะรวมกันถูกต้อง) แล้วค่อยส่งขึ้น Cloud
+        function saveStorage(key, data) {
+            if(!myUid) return Promise.resolve(false);
+            cloudData[key] = data;
+            return set(ref(db, `shared_farm_data/${key}`), data)
+                .then(() => true)
+                .catch(err => { console.error(err); alert("⚠️ บันทึกขึ้น Cloud ไม่สำเร็จ: " + err.message); return false; });
+        }
+        function deleteStorage(key) {
+            if(!myUid) return;
+            delete cloudData[key];
+            remove(ref(db, `shared_farm_data/${key}`)).catch(err => alert("⚠️ ลบข้อมูลไม่สำเร็จ: " + err.message));
+        }
+        // กันข้อความที่ผู้ใช้พิมพ์ไปแสดงเป็นโค้ด HTML
+        function esc(v) { return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        function asArray(v) { return Array.isArray(v) ? v.filter(Boolean) : Object.values(v || {}).filter(Boolean); }
+        // แสดงตัวเลข หรือ "ยังไม่มีข้อมูล" ถ้าเดือนนั้นไม่มีข้อมูล (แทนการโชว์ 0 ที่ทำให้เข้าใจผิด)
+        function setStat(id, value) {
+            const el = document.getElementById(id);
+            if (value === null) { el.innerText = 'ยังไม่มีข้อมูล'; el.classList.add('no-data'); }
+            else { el.innerText = value; el.classList.remove('no-data'); }
+        }
 
         window.refreshAllUI = () => {
             renderTodos('home'); renderTodos('garden');
+            updateUrgentBanner();
             renderIncidents('home'); renderIncidents('garden');
             window.renderIndividualTrees('home'); window.renderIndividualTrees('garden');
             window.loadSavedSensorData();
@@ -620,8 +664,8 @@
         window.toggleForm = (id) => { const el = document.getElementById(id); el.style.display = (el.style.display === "none" || el.style.display === "") ? "flex" : "none"; };
 
         function filterByMonth(records, selectedMonth) {
-            if (!records || !Array.isArray(records)) return [];
-            if (!selectedMonth) return records; 
+            records = asArray(records);
+            if (!selectedMonth) return records;
             return records.filter(r => {
                 const d = new Date(r.t);
                 const m = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
@@ -644,22 +688,19 @@
             const selectedZone = document.getElementById(`avg-water-zone-${loc}`).value;
             const waterData = getStorage(`sensor_water_acc_${selectedZone}_${loc}`, false);
             const recordsWa = filterByMonth(waterData?.records, currentMonth);
-            let avgWa = 0;
-            if (recordsWa.length > 0) { avgWa = (recordsWa.reduce((sum, r) => sum + r.v, 0) / recordsWa.length).toFixed(1); }
-            document.getElementById(`avg-wa-val-${loc}`).innerText = avgWa;
+            // ข้อมูลน้ำจาก RainPoint เป็นยอดรวมรายวัน จึงเฉลี่ยได้เป็น L/วัน
+            setStat(`avg-wa-val-${loc}`, recordsWa.length > 0 ? (recordsWa.reduce((sum, r) => sum + r.v, 0) / recordsWa.length).toFixed(1) : null);
 
             const rfData = getStorage(`sensor_rainfall_${loc}`, false);
             const recordsRF_month = filterByMonth(rfData?.records, currentMonth);
-            let sumRF = 0;
-            if (recordsRF_month.length > 0) { sumRF = recordsRF_month.reduce((sum, r) => sum + r.v, 0).toFixed(1); }
-            document.getElementById(`sum-rf-val-${loc}`).innerText = sumRF;
+            setStat(`sum-rf-val-${loc}`, recordsRF_month.length > 0 ? recordsRF_month.reduce((sum, r) => sum + r.v, 0).toFixed(1) : null);
 
             let rfYearlySums = Array(12).fill(0);
-            if (rfData && rfData.records) { rfData.records.forEach(r => { const d = new Date(r.t); if (d.getFullYear().toString() === currentYear) rfYearlySums[d.getMonth()] += r.v; }); }
+            if (rfData && rfData.records) { asArray(rfData.records).forEach(r => { const d = new Date(r.t); if (d.getFullYear().toString() === currentYear) rfYearlySums[d.getMonth()] += r.v; }); }
             updateChart(myCharts[`yearly-rf-${loc}`], `น้ำฝนสะสมปี ${currentYear} (mm)`, monthsLabel, rfYearlySums.map(v => parseFloat(v.toFixed(1))), '#17a2b8');
 
             let waYearlySums = Array(12).fill(0);
-            if (waterData && waterData.records) { waterData.records.forEach(r => { const d = new Date(r.t); if (d.getFullYear().toString() === currentYear) waYearlySums[d.getMonth()] += r.v; }); }
+            if (waterData && waterData.records) { asArray(waterData.records).forEach(r => { const d = new Date(r.t); if (d.getFullYear().toString() === currentYear) waYearlySums[d.getMonth()] += r.v; }); }
             updateChart(myCharts[`yearly-wa-${loc}`], `น้ำใช้สะสมปี ${currentYear} (L)`, monthsLabel, waYearlySums.map(v => parseFloat(v.toFixed(1))), loc === 'home' ? '#0056b3' : '#28a745');
 
             const smData = getStorage(`sensor_soil_moisture_${loc}`, false);
@@ -671,28 +712,28 @@
 
         // ================= To-Do System =================
         function renderTodos(loc) {
-            const list = document.getElementById(`list-todo-${loc}`); 
-            const todos = getStorage(`todos_${loc}`, true); 
+            const list = document.getElementById(`list-todo-${loc}`);
+            const todos = getStorage(`todos_${loc}`, true);
             list.innerHTML = '';
-            
+
             todos.forEach((todo, idx) => {
-                const li = document.createElement('li'); 
+                const li = document.createElement('li');
                 if(todo.completed) li.className = 'completed';
-                
-                const cb = document.createElement('input'); 
-                cb.type = 'checkbox'; 
+
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
                 cb.checked = todo.completed;
-                cb.onchange = () => { 
-                    todos[idx].completed = !todos[idx].completed; 
-                    saveStorage(`todos_${loc}`, todos); 
+                cb.onchange = () => {
+                    todos[idx].completed = !todos[idx].completed;
+                    saveStorage(`todos_${loc}`, todos);
                     renderTodos(loc);
                 };
-                
-                const sp = document.createElement('span'); 
-                sp.className = 'task-text'; 
+
+                const sp = document.createElement('span');
+                sp.className = 'task-text';
                 sp.innerText = todo.text;
-                
-                li.appendChild(cb); 
+
+                li.appendChild(cb);
                 li.appendChild(sp);
 
                 if(todo.date) {
@@ -700,7 +741,7 @@
                     const dateSpan = document.createElement('span');
                     dateSpan.className = 'due-date';
                     dateSpan.innerHTML = `🕒 ${dateObj.toLocaleDateString('th-TH')} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
-                    
+
                     const calBtn = document.createElement('button');
                     calBtn.innerHTML = '🗓️';
                     calBtn.style.background = 'none';
@@ -708,67 +749,90 @@
                     calBtn.style.cursor = 'pointer';
                     calBtn.style.marginLeft = '5px';
                     calBtn.title = 'บันทึกลง Google Calendar';
-                    
+
                     calBtn.onclick = () => {
-                        const dEnd = new Date(dateObj.getTime() + 60*60*1000); 
+                        const dEnd = new Date(dateObj.getTime() + 60*60*1000);
                         const startStr = dateObj.toISOString().replace(/-|:|\.\d\d\d/g,"");
                         const endStr = dEnd.toISOString().replace(/-|:|\.\d\d\d/g,"");
                         const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(todo.text)}&dates=${startStr}/${endStr}&details=${encodeURIComponent('รายการจาก Smart Farm Dashboard')}`;
                         window.open(url, '_blank');
                     };
-                    
+
                     dateSpan.appendChild(calBtn);
                     li.appendChild(dateSpan);
                 }
 
-                const del = document.createElement('button'); 
-                del.className = 'delete-btn'; 
+                const del = document.createElement('button');
+                del.className = 'delete-btn';
                 del.innerHTML = '🗑️';
                 del.style.background = 'none';
                 del.style.border = 'none';
                 del.style.cursor = 'pointer';
                 del.style.color = 'red';
-                del.onclick = () => { 
-                    todos.splice(idx, 1); 
-                    saveStorage(`todos_${loc}`, todos); 
-                    renderTodos(loc); 
+                del.onclick = () => {
+                    if (!confirm(`ลบรายการ "${todo.text}" ใช่หรือไม่?`)) return;
+                    todos.splice(idx, 1);
+                    saveStorage(`todos_${loc}`, todos);
+                    renderTodos(loc);
                 };
-                li.appendChild(del); 
-                
+                li.appendChild(del);
+
                 list.appendChild(li);
             });
         }
 
+        // แจ้งเตือนรายการที่ต้องทำภายใน 24 ชม. (และที่เลยกำหนดแล้ว)
+        let dismissedUrgent = '';
+        function updateUrgentBanner() {
+            const now = Date.now(), soon = now + 24*60*60*1000;
+            const items = [];
+            [['home','บ้าน'],['garden','บ้านสวน']].forEach(([loc, name]) => {
+                asArray(getStorage(`todos_${loc}`, true)).forEach(t => {
+                    if (t.completed || !t.date) return;
+                    const due = new Date(t.date).getTime();
+                    if (isNaN(due) || due > soon) return;
+                    items.push(`${t.text} (${name}${due < now ? ', เลยกำหนด' : ''})`);
+                });
+            });
+            const banner = document.getElementById('notification-banner');
+            const sig = items.join('|');
+            if (items.length && sig !== dismissedUrgent) {
+                document.getElementById('urgent-task-list').innerText = items.join(' · ');
+                banner.style.display = 'block';
+                banner.querySelector('.close-alert-btn').onclick = () => { dismissedUrgent = sig; banner.style.display = 'none'; };
+            } else if (!items.length) banner.style.display = 'none';
+        }
+
         window.addTodo = (loc) => {
-            const txt = document.getElementById(`todo-text-${loc}`).value; 
+            const txt = document.getElementById(`todo-text-${loc}`).value;
             const dt = document.getElementById(`todo-date-${loc}`).value;
             if(!txt.trim()) return;
-            
-            const todos = getStorage(`todos_${loc}`, true); 
-            todos.push({text: txt, date: dt, completed: false}); 
+
+            const todos = getStorage(`todos_${loc}`, true);
+            todos.push({text: txt, date: dt, completed: false});
             saveStorage(`todos_${loc}`, todos);
-            
-            document.getElementById(`todo-text-${loc}`).value = ''; 
+
+            document.getElementById(`todo-text-${loc}`).value = '';
             document.getElementById(`todo-date-${loc}`).value = '';
-            
-            renderTodos(loc); 
+
+            renderTodos(loc);
         };
 
         // ================= Incident System =================
         function renderIncidents(loc) {
-            const incidents = getStorage(`incidents_${loc}`, true); 
-            const listP1 = document.getElementById(`list-incident-${loc}`); 
-            const listP2 = document.getElementById(`list-incident-${loc}-p2`); 
+            const incidents = getStorage(`incidents_${loc}`, true);
+            const listP1 = document.getElementById(`list-incident-${loc}`);
+            const listP2 = document.getElementById(`list-incident-${loc}-p2`);
 
             const buildList = (container) => {
                 if(!container) return;
                 container.innerHTML = '';
                 incidents.forEach((inc, idx) => {
-                    const li = document.createElement('li'); 
+                    const li = document.createElement('li');
                     li.style.borderBottomColor = '#ffe0b2';
-                    
-                    const sp = document.createElement('span'); 
-                    sp.className = 'task-text'; 
+
+                    const sp = document.createElement('span');
+                    sp.className = 'task-text';
                     sp.innerText = inc.text;
                     li.appendChild(sp);
 
@@ -782,8 +846,8 @@
                         li.appendChild(dateSpan);
                     }
 
-                    const del = document.createElement('button'); 
-                    del.className = 'delete-btn'; 
+                    const del = document.createElement('button');
+                    del.className = 'delete-btn';
                     del.innerHTML = '✖';
                     del.style.background = 'none';
                     del.style.border = 'none';
@@ -791,12 +855,13 @@
                     del.style.color = '#e65100';
                     del.style.fontWeight = 'bold';
                     del.style.marginLeft = '10px';
-                    del.onclick = () => { 
-                        incidents.splice(idx, 1); 
-                        saveStorage(`incidents_${loc}`, incidents); 
-                        renderIncidents(loc); 
+                    del.onclick = () => {
+                        if (!confirm(`ลบเหตุการณ์ "${inc.text}" ใช่หรือไม่?`)) return;
+                        incidents.splice(idx, 1);
+                        saveStorage(`incidents_${loc}`, incidents);
+                        renderIncidents(loc);
                     };
-                    li.appendChild(del); 
+                    li.appendChild(del);
                     container.appendChild(li);
                 });
             };
@@ -809,17 +874,17 @@
             const suffix = pageSuffix ? `-${pageSuffix}` : '';
             const txtEl = document.getElementById(`incident-text-${loc}${suffix}`);
             const dtEl = document.getElementById(`incident-date-${loc}${suffix}`);
-            
+
             if(!txtEl || !txtEl.value.trim()) return;
-            
-            const incidents = getStorage(`incidents_${loc}`, true); 
-            incidents.push({text: txtEl.value, date: dtEl.value}); 
+
+            const incidents = getStorage(`incidents_${loc}`, true);
+            incidents.push({text: txtEl.value, date: dtEl.value});
             saveStorage(`incidents_${loc}`, incidents);
-            
-            txtEl.value = ''; 
+
+            txtEl.value = '';
             dtEl.value = '';
-            
-            renderIncidents(loc); 
+
+            renderIncidents(loc);
         };
 
         window.downloadICS = (loc) => {
@@ -864,64 +929,64 @@
         };
 
         window.renderIndividualTrees = (loc) => {
-            const grid = document.getElementById(`tree-grid-${loc}`); 
-            let rawTrees = getStorage(`individual_trees_${loc}`, true); 
+            const grid = document.getElementById(`tree-grid-${loc}`);
+            let rawTrees = getStorage(`individual_trees_${loc}`, true);
             const trees = Array.isArray(rawTrees) ? rawTrees : Object.values(rawTrees || {});
-            
+
             grid.innerHTML = '';
-            
+
             const searchQuery = (document.getElementById(`search-tree-${loc}`)?.value || '').toLowerCase();
 
             trees.forEach((tree, originalIdx) => {
-                if (!tree) return; 
+                if (!tree) return;
 
                 const formattedDate = tree.date ? new Date(tree.date).toLocaleDateString('th-TH') : '';
                 const formattedFertDate = tree.fertDate ? new Date(tree.fertDate).toLocaleDateString('th-TH') : '';
-                
+
                 if(searchQuery) {
                     const targetStr = `${tree.name || ''} ${formattedDate} ${formattedFertDate} ${tree.status || ''} ${tree.note || ''} ${tree.soil || ''} ${tree.fert || ''}`.toLowerCase();
-                    if(!targetStr.includes(searchQuery)) return; 
+                    if(!targetStr.includes(searchQuery)) return;
                 }
 
-                const card = document.createElement('div'); 
+                const card = document.createElement('div');
                 card.className = `tree-card`;
-                
+
                 const isFertOnly = !tree.name;
-                
+
                 if (isFertOnly) {
-                    card.style.borderLeftColor = '#856404'; 
+                    card.style.borderLeftColor = '#856404';
                     card.style.backgroundColor = '#fffcf5';
                 } else if(loc === 'garden') {
-                    card.style.borderLeftColor = '#0056b3'; 
+                    card.style.borderLeftColor = '#0056b3';
                 }
 
                 let extraInfo = '';
                 if(tree.soil || tree.fert || tree.amount || tree.qty || tree.fertDate) {
                     extraInfo += `<div style="background: #fdfbf7; padding: 12px; border-radius: 8px; margin-top: ${isFertOnly ? '10px' : '15px'}; font-size: 0.9em; border: 1px dashed #d1c4a5;">`;
                     if(!isFertOnly) extraInfo += `<div style="margin-bottom: 8px; font-weight: bold; color: #856404;">🧪 บันทึกการบำรุง:</div>`;
-                    
+
                     if(tree.fertDate) extraInfo += `<div style="margin-bottom:4px; color:#28a745;">📅 <strong>วันที่บำรุง:</strong> ${formattedFertDate}</div>`;
-                    if(tree.soil) extraInfo += `<div style="margin-bottom:4px;">🪨 <strong>ชนิดดิน:</strong> ${tree.soil}</div>`;
-                    if(tree.fert) extraInfo += `<div style="margin-bottom:4px;">🧪 <strong>ชนิดปุ๋ย:</strong> ${tree.fert}</div>`;
-                    if(tree.amount) extraInfo += `<div style="margin-bottom:4px;">⚖️ <strong>ปริมาณ:</strong> ${tree.amount}</div>`;
-                    if(tree.qty) extraInfo += `<div>🌳 <strong>จำนวน:</strong> ${tree.qty} ต้น</div>`;
+                    if(tree.soil) extraInfo += `<div style="margin-bottom:4px;">🪨 <strong>ชนิดดิน:</strong> ${esc(tree.soil)}</div>`;
+                    if(tree.fert) extraInfo += `<div style="margin-bottom:4px;">🧪 <strong>ชนิดปุ๋ย:</strong> ${esc(tree.fert)}</div>`;
+                    if(tree.amount) extraInfo += `<div style="margin-bottom:4px;">⚖️ <strong>ปริมาณ:</strong> ${esc(tree.amount)}</div>`;
+                    if(tree.qty) extraInfo += `<div>🌳 <strong>จำนวน:</strong> ${esc(tree.qty)} ต้น</div>`;
                     extraInfo += `</div>`;
                 }
 
                 let cardContent = `<button class="delete-tree-btn" onclick="window.deleteIndividualTree('${loc}', ${originalIdx})" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.2em; color: red; cursor: pointer;">🗑️</button>`;
-                
+
                 if (isFertOnly) {
                     cardContent += `<h4 style="color: #856404;">🌾 บันทึกการบำรุง (ทั่วไป)</h4>`;
-                    if(tree.note) cardContent += `<p>📝 <strong>หมายเหตุ:</strong> ${tree.note}</p>`;
+                    if(tree.note) cardContent += `<p>📝 <strong>หมายเหตุ:</strong> ${esc(tree.note)}</p>`;
                     cardContent += extraInfo;
                 } else {
-                    cardContent += `<h4>${tree.name}</h4>`;
+                    cardContent += `<h4>${esc(tree.name)}</h4>`;
                     if(formattedDate) cardContent += `<p>🕒 <strong>วันที่บันทึก/ปลูก:</strong> ${formattedDate}</p>`;
-                    cardContent += `<p>📊 <strong>สถานะ:</strong> <span class="status-badge status-${tree.status}">${tree.status}</span></p>`;
-                    if(tree.note) cardContent += `<p>📝 <strong>หมายเหตุ:</strong> ${tree.note}</p>`;
+                    cardContent += `<p>📊 <strong>สถานะ:</strong> <span class="status-badge status-${esc(tree.status)}">${esc(tree.status)}</span></p>`;
+                    if(tree.note) cardContent += `<p>📝 <strong>หมายเหตุ:</strong> ${esc(tree.note)}</p>`;
                     cardContent += extraInfo;
                 }
-                
+
                 card.innerHTML = cardContent;
                 grid.appendChild(card);
             });
@@ -929,31 +994,31 @@
 
         window.addIndividualTree = (loc) => {
             try {
-                const name = document.getElementById(`t-name-${loc}`).value.trim(); 
+                const name = document.getElementById(`t-name-${loc}`).value.trim();
                 const date = document.getElementById(`t-date-${loc}`).value;
-                const status = document.getElementById(`t-status-${loc}`).value; 
-                
+                const status = document.getElementById(`t-status-${loc}`).value;
+
                 const fertDateEl = document.getElementById(`t-fert-date-${loc}`);
                 const fertDate = fertDateEl ? fertDateEl.value : '';
-                
+
                 const soil = document.getElementById(`t-soil-${loc}`).value.trim();
-                const fert = document.getElementById(`t-fert-${loc}`).value.trim(); 
+                const fert = document.getElementById(`t-fert-${loc}`).value.trim();
                 const amount = document.getElementById(`t-amount-${loc}`).value.trim();
-                const qty = document.getElementById(`t-qty-${loc}`).value.trim(); 
+                const qty = document.getElementById(`t-qty-${loc}`).value.trim();
                 const note = document.getElementById(`t-note-${loc}`).value.trim();
-                
+
                 if(!name && !soil && !fert && !note && !amount && !qty && !fertDate && !date) {
                     alert("⚠️ กรุณากรอกข้อมูลอย่างน้อย 1 ช่องก่อนกดบันทึกครับ");
                     return;
                 }
-                
-                let rawTrees = getStorage(`individual_trees_${loc}`, true); 
+
+                let rawTrees = getStorage(`individual_trees_${loc}`, true);
                 let trees = Array.isArray(rawTrees) ? rawTrees : Object.values(rawTrees || {});
-                
-                trees.push({name, date, status, fertDate, soil, fert, amount, qty, note}); 
+
+                trees.push({name, date, status, fertDate, soil, fert, amount, qty, note});
                 saveStorage(`individual_trees_${loc}`, trees);
-                
-                document.getElementById(`t-name-${loc}`).value = ''; 
+
+                document.getElementById(`t-name-${loc}`).value = '';
                 document.getElementById(`t-date-${loc}`).value = '';
                 if(fertDateEl) fertDateEl.value = '';
                 document.getElementById(`t-soil-${loc}`).value = '';
@@ -982,21 +1047,23 @@
 
                     let rawTrees = getStorage(`individual_trees_${loc}`, true);
                     let trees = Array.isArray(rawTrees) ? rawTrees : Object.values(rawTrees || {});
-                    
+
                     let addedCount = 0;
 
                     const parseDate = (val) => {
                         if (!val) return '';
-                        if (val instanceof Date) return val.toISOString().split('T')[0];
+                        // ใช้วันที่ตามเวลาไทย (toISOString เป็นเวลา UTC ทำให้วันที่เลื่อนไป 1 วัน)
+                        const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                        if (val instanceof Date) return ymd(val);
                         const parsed = new Date(val);
-                        if(!isNaN(parsed.getTime())) return parsed.toISOString().split('T')[0];
+                        if(!isNaN(parsed.getTime())) return ymd(parsed);
                         return String(val);
                     };
 
                     for(let i = 1; i < excelData.length; i++) {
                         const row = excelData[i];
                         if(!row || row.length === 0) continue;
-                        
+
                         const name = row[0] ? String(row[0]).trim() : '';
                         const date = parseDate(row[1]);
                         const status = row[2] ? String(row[2]).trim() : 'ปกติ';
@@ -1022,21 +1089,30 @@
                 }
             };
             reader.readAsBinaryString(file);
-            event.target.value = ''; 
+            event.target.value = '';
         };
-        
-        window.deleteIndividualTree = (loc, idx) => { 
-            if(confirm("คุณต้องการลบข้อมูลนี้ใช่หรือไม่?")) { 
-                let rawTrees = getStorage(`individual_trees_${loc}`, true); 
+
+        window.deleteIndividualTree = (loc, idx) => {
+            if(confirm("คุณต้องการลบข้อมูลนี้ใช่หรือไม่?")) {
+                let rawTrees = getStorage(`individual_trees_${loc}`, true);
                 let trees = Array.isArray(rawTrees) ? rawTrees : Object.values(rawTrees || {});
-                trees.splice(idx, 1); 
-                saveStorage(`individual_trees_${loc}`, trees); 
-                window.renderIndividualTrees(loc); 
-            } 
+                trees.splice(idx, 1);
+                saveStorage(`individual_trees_${loc}`, trees);
+                window.renderIndividualTrees(loc);
+            }
         };
 
         function hexToRgba(hex, alpha) { let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16); return `rgba(${r}, ${g}, ${b}, ${alpha})`; }
         Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"; Chart.defaults.color = '#777';
+        // ถ้ากราฟไม่มีข้อมูล ให้เขียนข้อความบอกแทนกราฟว่างเปล่า
+        Chart.register({ id: 'noData', afterDraw(chart) {
+            const hasData = chart.data.datasets.some(ds => (ds.data || []).some(v => v !== null && v !== undefined && v !== 0));
+            if (hasData) return;
+            const { ctx, chartArea: a } = chart; if (!a) return;
+            ctx.save(); ctx.fillStyle = '#999'; ctx.font = "15px 'Segoe UI', Tahoma, sans-serif"; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('ยังไม่มีข้อมูล', (a.left + a.right) / 2, (a.top + a.bottom) / 2);
+            ctx.restore();
+        } });
         let myCharts = {};
 
         function initCharts() {
@@ -1051,8 +1127,22 @@
 
         window.loadSavedSensorData = () => {
             const currentMonth = document.getElementById('global-month').value;
-            const savedTreeHome = getStorage('tree_count_home', false); document.getElementById('tree-home').innerText = (savedTreeHome !== null) ? Number(savedTreeHome).toLocaleString() : "0";
-            const savedTreeGarden = getStorage('tree_count_garden', false); document.getElementById('tree-garden').innerText = (savedTreeGarden !== null) ? Number(savedTreeGarden).toLocaleString() : "0";
+            ['home', 'garden'].forEach(loc => {
+                // นับอัตโนมัติ: ชื่อต้นไม้ที่ไม่ซ้ำกัน (รายการที่บันทึกแค่ปุ๋ยโดยไม่มีชื่อ จะไม่ถูกนับ)
+                const latest = {};
+                asArray(getStorage(`individual_trees_${loc}`, true)).forEach(t => {
+                    const name = String(t.name || '').trim();
+                    if (!name) return;
+                    const k = name.toLowerCase();
+                    if (!latest[k] || String(t.date || '') >= String(latest[k].date || '')) latest[k] = t;
+                });
+                const list = Object.values(latest);
+                const needCare = list.filter(t => t.status === 'ต้องดูแล').length;
+                document.getElementById(`tree-${loc}`).innerText = list.length.toLocaleString();
+                document.getElementById(`tree-note-${loc}`).innerText = list.length
+                    ? (needCare ? `🔴 ต้องดูแลพิเศษ ${needCare} ต้น · นับจากชื่อต้นไม้ที่บันทึกไว้` : 'นับอัตโนมัติจากชื่อต้นไม้ที่บันทึกไว้')
+                    : 'ยังไม่มีชื่อต้นไม้ เพิ่มได้ที่หน้า "ข้อมูลต้นไม้"';
+            });
 
             ['home', 'garden'].forEach(loc => {
                 const types = [ {id: 'rainfall', key: 'rf', label: 'ปริมาณน้ำฝน (mm)', color: '#4bc0c0'}, {id: 'soil_moisture', key: 'sm', label: 'ความชื้นในดิน (%)', color: '#36a2eb'}, {id: 'light_intensity', key: 'li', label: 'ความเข้มแสง (Lux)', color: '#ffce56'}, {id: 'soil_temp', key: 'st', label: 'อุณหภูมิดิน (°C)', color: '#ff6384'} ];
@@ -1067,74 +1157,117 @@
             });
         };
 
-        window.handleMultipleFileUpload = (event, loc) => {
-            const files = event.target.files; 
-            if(files.length === 0) return;
-            
-            const selectedMode = document.getElementById(`data-type-${loc}`).value; 
-            
-            // ป้องกัน Error กรณีหาช่องเลือกโซนน้ำไม่เจอ
-            const waterZoneEl = document.getElementById(`upload-water-zone-${loc}`);
-            const uploadWaterZone = waterZoneEl ? waterZoneEl.value : '1';
+        // ---------- อ่านไฟล์ RainPoint ----------
+        const SENSOR_NAMES = { rainfall: 'ปริมาณน้ำฝน', soil_moisture: 'ความชื้นดิน', light_intensity: 'ความเข้มแสง', soil_temp: 'อุณหภูมิดิน' };
+        const sensorName = (type) => type.startsWith('water_acc_') ? `ปริมาณน้ำ จุดที่ ${type.split('_')[2]}` : (SENSOR_NAMES[type] || type);
 
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
+        // 1) ดูจากชื่อไฟล์ก่อน เช่น HCS021FRFSoilMoisture30Days_xxx.xlsx
+        function typeFromFileName(fileName, waterZone) {
+            const n = fileName.toLowerCase();
+            if (n.includes('humid')) return 'unsupported';
+            if (n.includes('moisture')) return 'soil_moisture';
+            if (n.includes('temp')) return 'soil_temp';
+            if (n.includes('rain') || n.includes('precip')) return 'rainfall';
+            if (n.includes('light') || n.includes('lux') || n.includes('illum')) return 'light_intensity';
+            if (/water|flow|usage|consum|irrig|volume/.test(n)) return `water_acc_${waterZone}`;
+            return '';
+        }
+        // 2) ถ้าชื่อไฟล์ไม่บอก ดูจากหน่วยในคอลัมน์ Value
+        function typeFromUnit(rows, waterZone) {
+            for (let i = 1; i < Math.min(30, rows.length); i++) {
+                const v = rows[i] && rows[i][1];
+                if (v == null || typeof v === 'number') continue;
+                const u = String(v).toUpperCase().replace(/[0-9.,\s-]/g, '');
+                if (!u) continue;
+                if (u.includes('LX') || u.includes('LUX')) return 'light_intensity';
+                if (u.includes('MM')) return 'rainfall';
+                if (u.includes('%')) return 'soil_moisture';
+                if (u.includes('℃') || u.includes('°') || u === 'C' || u === 'F') return 'soil_temp';
+                if (u === 'L' || u.startsWith('L') || u.includes('GAL')) return `water_acc_${waterZone}`;
+            }
+            return '';
+        }
+        // อ่านวันเวลาได้หลายรูปแบบ: 2026/08/28 00:00, 2026-08-28, 28/08/2026 00:00, หรือช่องวันที่ของ Excel
+        function parseTime(val) {
+            if (val instanceof Date) return isNaN(val) ? null : val.getTime();
+            if (typeof val === 'number') { const d = XLSX.SSF.parse_date_code(val); return d ? new Date(d.y, d.m - 1, d.d, d.H, d.M).getTime() : null; }
+            const s = String(val ?? '').trim();
+            let m = s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+            if (m) return new Date(+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0)).getTime();
+            m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})(?:[ T](\d{1,2}):(\d{2}))?/);
+            if (m) return new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0)).getTime();
+            const d = new Date(s); return isNaN(d) ? null : d.getTime();
+        }
+        const fmtDay = (t) => { const d = new Date(t); return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`; };
+
+        window.handleMultipleFileUpload = (event, loc) => {
+            const files = Array.from(event.target.files);
+            if (files.length === 0) return;
+            const waterZone = document.getElementById(`upload-water-zone-${loc}`).value;
+            const msgBox = document.getElementById(`upload-msg-${loc}`);
+            msgBox.innerHTML = '⏳ กำลังอ่านไฟล์...';
+            const lines = [];
+
+            // อ่านทีละไฟล์ตามลำดับ เพื่อให้ไฟล์ชนิดเดียวกันรวมกันได้ถูกต้อง
+            (async () => {
+                for (const file of files) {
                     try {
-                        const data = e.target.result; 
-                        const workbook = XLSX.read(data, {type: 'binary', cellDates: true});
-                        const excelData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1, raw: false});
-                        let targetType = '';
-                        
-                        if (selectedMode === 'tree_count') {
-                            targetType = 'tree_count';
-                        } else {
-                            let sampleVal = "";
-                            for(let i = 0; i < Math.min(20, excelData.length); i++) {
-                                if(excelData[i] && excelData[i][1] != null) { 
-                                    let val = String(excelData[i][1]).toUpperCase();
-                                    if(val !== "VALUE" && val.trim() !== "") { sampleVal = val; break; }
-                                }
-                            }
-                            if(sampleVal.includes('LX')) targetType = 'light_intensity'; 
-                            else if(sampleVal.includes('MM')) targetType = 'rainfall';
-                            else if(sampleVal.includes('%') || sampleVal.includes('RH')) targetType = 'soil_moisture'; 
-                            else if(sampleVal.includes('C') || sampleVal.includes('℃')) targetType = 'soil_temp';
-                            else if(sampleVal.includes('L')) targetType = `water_acc_${uploadWaterZone}`;
-                        }
-                        
-                        if(targetType) {
-                            processData(excelData, loc, targetType); 
-                            // บังคับให้อัปเดตกราฟทันทีโดยไม่ต้องรอ F5
-                            setTimeout(() => {
-                                window.loadSavedSensorData();
-                                window.updatePage1Averages(loc);
-                            }, 300);
-                        } else {
-                            alert(`⚠️ อ่านไฟล์ "${file.name}" ไม่สำเร็จ!\nไม่พบสัญลักษณ์หน่วย (C, %, MM, LX) ในคอลัมน์ที่ 2 ระบบจึงไม่รู้ว่าเป็นเซ็นเซอร์ชนิดไหนครับ`);
-                        }
-                    } catch(error) { 
-                        alert("เกิดข้อผิดพลาดในการอ่านไฟล์: " + error.message); 
+                        const buf = await file.arrayBuffer();
+                        const workbook = XLSX.read(buf, { type: 'array', cellDates: true });
+                        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1, raw: true });
+                        let type = typeFromFileName(file.name, waterZone) || typeFromUnit(rows, waterZone);
+                        if (type === 'unsupported') { lines.push(`<span class="err">✖ ${esc(file.name)}: ความชื้นอากาศยังไม่มีกราฟรองรับ</span>`); continue; }
+                        if (!type) { lines.push(`<span class="err">✖ ${esc(file.name)}: ไม่รู้ว่าเป็นเซ็นเซอร์ชนิดไหน (ไม่พบคำในชื่อไฟล์ หรือหน่วย %, ℃, mm, Lx, L)</span>`); continue; }
+                        const r = await processData(rows, loc, type);
+                        if (!r) { lines.push(`<span class="err">✖ ${esc(file.name)}: ไม่พบข้อมูลเวลา/ค่าในไฟล์</span>`); continue; }
+                        if (!r.saved) { lines.push(`<span class="err">✖ ${esc(file.name)}: บันทึกขึ้น Cloud ไม่สำเร็จ</span>`); continue; }
+                        lines.push(`<span class="ok">✔ ${esc(file.name)} → ${sensorName(type)}: ${r.count.toLocaleString()} ค่า (${fmtDay(r.first)} – ${fmtDay(r.last)}), ใหม่ ${r.added.toLocaleString()} ค่า${r.updated ? `, ซ้ำ/อัปเดต ${r.updated.toLocaleString()} ค่า` : ''}</span>`);
+                    } catch (error) {
+                        lines.push(`<span class="err">✖ ${esc(file.name)}: อ่านไฟล์ไม่ได้ (${esc(error.message)})</span>`);
                     }
-                };
-                reader.readAsBinaryString(file);
-            });
-            event.target.value = ''; 
+                }
+                msgBox.innerHTML = lines.join('<br>');
+                window.refreshAllUI();
+            })();
+            event.target.value = '';
         };
 
-        function processData(data, loc, type) {
-            let records = [];
-            for (let i = 1; i < data.length; i++) {
-                if (data[i] && data[i][0] != null && data[i][1] != null) { 
-                    let rawLabel = data[i][0]; let dateObj = (rawLabel instanceof Date) ? rawLabel : new Date(rawLabel);
-                    let cleanStr = String(data[i][1]).replace(/[^0-9.-]/g, ''); const numValue = Number(cleanStr);
-                    if(!isNaN(dateObj.getTime()) && !isNaN(numValue) && cleanStr !== "") records.push({ t: dateObj.getTime(), v: numValue }); 
-                }
+        // รวมข้อมูลใหม่เข้ากับของเดิม (ไม่ลบของเดิม) ถ้าเวลาเดียวกันซ้ำ ใช้ค่าจากไฟล์ใหม่
+        async function processData(rows, loc, type) {
+            let head = (rows[0] || []).map(x => String(x ?? '').toLowerCase());
+            const startRow = head.some(h => /time|date|เวลา|วันที่/.test(h)) ? 1 : 0;
+            const map = new Map();
+            let count = 0, first = Infinity, last = -Infinity;
+            for (let i = startRow; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row || row[0] == null || row[1] == null) continue;
+                const t = parseTime(row[0]);
+                const numValue = typeof row[1] === 'number' ? row[1] : Number(String(row[1]).replace(/[^0-9.-]/g, ''));
+                if (t == null || String(row[1]).trim() === '' || isNaN(numValue)) continue;
+                map.set(t, numValue); count++;
+                first = Math.min(first, t); last = Math.max(last, t);
             }
-            if(records.length === 0) return;
-            if (type === 'tree_count') saveStorage(`tree_count_${loc}`, records[records.length - 1].v); 
-            else saveStorage(`sensor_${type}_${loc}`, { records: records }); 
+            if (count === 0) return null;
+
+            const key = `sensor_${type}_${loc}`;
+            const merged = new Map(asArray(getStorage(key, false)?.records).filter(r => r.t != null).map(r => [r.t, r.v]));
+            let added = 0, updated = 0;
+            map.forEach((v, t) => { if (merged.has(t)) updated++; else added++; merged.set(t, v); });
+            const records = Array.from(merged, ([t, v]) => ({ t, v })).sort((a, b) => a.t - b.t);
+            const saved = await saveStorage(key, { records });
+            return { saved, count, added, updated, first, last };
         }
+
+        // สำรองข้อมูลทั้งหมดจาก Cloud เป็นไฟล์ .json เก็บไว้ในเครื่อง
+        window.downloadBackup = () => {
+            const d = new Date();
+            const name = `farm-backup-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.json`;
+            const blob = new Blob([JSON.stringify(cloudData, null, 1)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = name;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
 
         function updateChart(chart, label, labels, data, color) {
             chart.data.labels = labels; const dsIndex = chart.data.datasets.findIndex(ds => ds.label === label);
@@ -1143,14 +1276,27 @@
             gradient.addColorStop(0, hexToRgba(color, 0.5)); gradient.addColorStop(1, hexToRgba(color, 0.05));
             const datasetConfig = { label: label, data: data, borderColor: color, backgroundColor: isLine ? gradient : hexToRgba(color, 0.8), borderWidth: isLine ? 2 : 0, fill: isLine, tension: 0.1, pointBackgroundColor: '#ffffff', pointBorderColor: color, pointBorderWidth: 2, pointRadius: data.length > 30 ? 0 : 3, pointHoverRadius: 5, borderRadius: isLine ? 0 : 4 };
             if (dsIndex >= 0) chart.data.datasets[dsIndex] = datasetConfig; else chart.data.datasets.push(datasetConfig);
-            chart.update(); 
+            // กราฟเส้น: ให้แกน Y กว้างอย่างน้อย 10 หน่วย เพื่อไม่ให้การเปลี่ยนแปลงเล็กน้อย (เช่น 43→44%) ดูเหมือนขึ้นลงแรง
+            const nums = data.filter(v => typeof v === 'number' && !isNaN(v));
+            if (isLine && nums.length) {
+                const lo = Math.min(...nums), hi = Math.max(...nums), mid = (lo + hi) / 2, half = Math.max(5, (hi - lo) / 2);
+                chart.options.scales.y.suggestedMin = Math.floor(mid - half);
+                chart.options.scales.y.suggestedMax = Math.ceil(mid + half);
+                if (label.includes('%')) { chart.options.scales.y.min = Math.max(0, Math.floor(mid - half)); chart.options.scales.y.max = Math.min(100, Math.ceil(mid + half)); }
+            } else {
+                delete chart.options.scales.y.suggestedMin; delete chart.options.scales.y.suggestedMax;
+                delete chart.options.scales.y.min; delete chart.options.scales.y.max;
+            }
+            chart.update();
         }
 
         window.clearData = (type, loc) => {
-            if (confirm(`คุณต้องการลบข้อมูลกราฟนี้บน Cloud ใช่หรือไม่?`)) {
-                if (type === 'tree_count') deleteStorage(`tree_count_${loc}`); 
-                else if (type === 'water_acc') { const zone = document.getElementById(`view-water-zone-${loc}`).value; deleteStorage(`sensor_water_acc_${zone}_${loc}`); }
-                else deleteStorage(`sensor_${type}_${loc}`); 
+            const place = loc === 'home' ? 'บ้าน' : 'บ้านสวน';
+            let key = `sensor_${type}_${loc}`, name = sensorName(type);
+            if (type === 'water_acc') { const zone = document.getElementById(`view-water-zone-${loc}`).value; key = `sensor_water_acc_${zone}_${loc}`; name = `ปริมาณน้ำ จุดที่ ${zone}`; }
+            if (confirm(`⚠️ ลบข้อมูล "${name}" (${place}) ทั้งหมดทุกเดือนบน Cloud?\n\nกู้คืนไม่ได้ แนะนำให้กด "ดาวน์โหลดสำรองข้อมูล" ก่อน`)) {
+                deleteStorage(key);
+                window.refreshAllUI();
             }
         };
 
@@ -1170,7 +1316,7 @@
             if (code >= 95 && code <= 99) return '⛈️';
             return '🌤️';
         };
-        
+
         const getWeatherDesc = (code) => {
             if (code === 0) return 'ท้องฟ้าแจ่มใส';
             if (code === 1 || code === 2) return 'มีเมฆบางส่วน';
@@ -1192,18 +1338,19 @@
 
         async function initWeather() {
             // 🔥 ฝังพิกัด GPS จริงตามที่ได้รับมอบหมาย
-            const latHome = 13.7377070, lonHome = 100.7055940; 
-            const latGarden = 12.701087, lonGarden = 99.758850; 
+            // ใช้พิกัดโดยประมาณ (ทศนิยม 2 ตำแหน่ง ≈ 1 กม.) พอสำหรับพยากรณ์อากาศ และไม่เปิดเผยตำแหน่งบ้านที่แน่นอน
+            const latHome = 13.74, lonHome = 100.71;
+            const latGarden = 12.70, lonGarden = 99.76;
 
             const fetchW = async (loc, lat, lon) => {
                 try {
                     const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&hourly=temperature_2m&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FBangkok`);
                     const data = await res.json();
-                    
+
                     document.getElementById(`temp-current-${loc}`).innerText = Math.round(data.current.temperature_2m);
                     document.getElementById(`weather-icon-${loc}`).innerText = getWeatherIcon(data.current.weather_code);
                     document.getElementById(`weather-desc-${loc}`).innerText = getWeatherDesc(data.current.weather_code);
-                    
+
                     const maxTemp = data.daily.temperature_2m_max[0];
                     const minTemp = data.daily.temperature_2m_min[0];
                     document.getElementById(`temp-max-${loc}`).innerText = Math.round(maxTemp);
@@ -1228,8 +1375,8 @@
                     document.getElementById(`time-max-${loc}`).innerText = formatTimeFromIso(data.hourly.time[maxTimeIndex]);
                     document.getElementById(`time-min-${loc}`).innerText = formatTimeFromIso(data.hourly.time[minTimeIndex]);
 
-                } catch(e) { 
-                    console.error('Weather error:', e); 
+                } catch(e) {
+                    console.error('Weather error:', e);
                     document.getElementById(`weather-desc-${loc}`).innerText = 'ไม่สามารถดึงข้อมูลได้';
                 }
             };
@@ -1238,9 +1385,9 @@
             fetchW('garden', latGarden, lonGarden);
         }
 
-        document.addEventListener('DOMContentLoaded', () => { 
-            initCharts(); 
-            initWeather(); 
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            initWeather();
         });
     </script>
 </body>
