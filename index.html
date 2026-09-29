@@ -123,6 +123,17 @@
         .site-switch button.on { background: #28a745; color: white; }
         .site-switch button.on[data-site="garden"] { background: #0056b3; }
 
+        /* เหตุการณ์ผิดปกติ: ช่วงเวลา + จุด */
+        .inc-label { font-size: 0.85em; color: #666; margin-bottom: -4px; }
+        .inc-points { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.95em; align-items: center; }
+        .inc-points label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+        .inc-points input { transform: scale(1.15); }
+        .inc-chip { display: inline-block; font-size: 0.8em; padding: 2px 8px; border-radius: 10px; background: #fff3e0; color: #e65100; margin: 3px 6px 0 0; }
+        .inc-filter { display: flex; align-items: center; gap: 6px; font-size: 0.85em; color: #777; margin-bottom: 6px; }
+        .inc-filter select { padding: 3px 6px; border-radius: 6px; border: 1px solid #ffcc80; }
+        .inc-item { flex-direction: column; align-items: flex-start !important; position: relative; padding-right: 30px !important; }
+        .inc-item .delete-btn { position: absolute; right: 0; top: 10px; }
+
         /* การ์ดเปรียบเทียบ */
         .compare-table { width: 100%; border-collapse: collapse; font-size: 0.92em; }
         .compare-table th, .compare-table td { padding: 8px 6px; border-bottom: 1px solid #eee; text-align: right; white-space: nowrap; }
@@ -262,9 +273,23 @@
                             <button class="toggle-btn" style="background: #ffe0b2; color: #e65100;" onclick="window.toggleForm('form-incident-home')">+</button>
                         </div>
                         <div id="form-incident-home" class="add-form" style="background: white; border: 1px solid #ffcc80;">
-                            <input type="text" id="incident-text-home" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, แมลงระบาด)">
+                            <input type="text" id="incident-text-home" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, ท่อรั่ว, แมลงระบาด)">
+                            <div class="inc-label">เริ่ม</div>
                             <input type="datetime-local" id="incident-date-home">
+                            <div class="inc-label">สิ้นสุด (เว้นว่างได้ ถ้าเกิดครั้งเดียว)</div>
+                            <input type="datetime-local" id="incident-end-home">
+                            <div class="inc-label">จุดที่เกิด (ไม่เลือก = ทั้งพื้นที่)</div>
+                            <div class="inc-points" id="incident-points-home">
+                                <label><input type="checkbox" value="1"> จุด 1</label>
+                                <label><input type="checkbox" value="2"> จุด 2</label>
+                                <label><input type="checkbox" value="3"> จุด 3</label>
+                            </div>
                             <button style="background-color: #f57c00;" onclick="window.addIncident('home')">บันทึกเหตุการณ์</button>
+                        </div>
+                        <div class="inc-filter">แสดง:
+                            <select id="incident-filter-home" onchange="window.renderIncidentsFor('home')">
+                                <option value="all">ทุกจุด</option><option value="1">จุด 1</option><option value="2">จุด 2</option><option value="3">จุด 3</option>
+                            </select>
                         </div>
                         <ul id="list-incident-home" class="todo-list"></ul>
                     </div>
@@ -350,9 +375,23 @@
                             <button class="toggle-btn" style="background: #ffe0b2; color: #e65100;" onclick="window.toggleForm('form-incident-garden')">+</button>
                         </div>
                         <div id="form-incident-garden" class="add-form" style="background: white; border: 1px solid #ffcc80;">
-                            <input type="text" id="incident-text-garden" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, แมลงระบาด)">
+                            <input type="text" id="incident-text-garden" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, ท่อรั่ว, แมลงระบาด)">
+                            <div class="inc-label">เริ่ม</div>
                             <input type="datetime-local" id="incident-date-garden">
+                            <div class="inc-label">สิ้นสุด (เว้นว่างได้ ถ้าเกิดครั้งเดียว)</div>
+                            <input type="datetime-local" id="incident-end-garden">
+                            <div class="inc-label">จุดที่เกิด (ไม่เลือก = ทั้งพื้นที่)</div>
+                            <div class="inc-points" id="incident-points-garden">
+                                <label><input type="checkbox" value="1"> จุด 1</label>
+                                <label><input type="checkbox" value="2"> จุด 2</label>
+                                <label><input type="checkbox" value="3"> จุด 3</label>
+                            </div>
                             <button style="background-color: #f57c00;" onclick="window.addIncident('garden')">บันทึกเหตุการณ์</button>
+                        </div>
+                        <div class="inc-filter">แสดง:
+                            <select id="incident-filter-garden" onchange="window.renderIncidentsFor('garden')">
+                                <option value="all">ทุกจุด</option><option value="1">จุด 1</option><option value="2">จุด 2</option><option value="3">จุด 3</option>
+                            </select>
                         </div>
                         <ul id="list-incident-garden" class="todo-list"></ul>
                     </div>
@@ -407,9 +446,23 @@
                             <button class="toggle-btn" style="background: #ffe0b2; color: #e65100;" onclick="window.toggleForm('form-incident-home-p2')">+</button>
                         </div>
                         <div id="form-incident-home-p2" class="add-form" style="background: white; border: 1px solid #ffcc80;">
-                            <input type="text" id="incident-text-home-p2" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, แมลงระบาด)">
+                            <input type="text" id="incident-text-home-p2" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, ท่อรั่ว, แมลงระบาด)">
+                            <div class="inc-label">เริ่ม</div>
                             <input type="datetime-local" id="incident-date-home-p2">
+                            <div class="inc-label">สิ้นสุด (เว้นว่างได้ ถ้าเกิดครั้งเดียว)</div>
+                            <input type="datetime-local" id="incident-end-home-p2">
+                            <div class="inc-label">จุดที่เกิด (ไม่เลือก = ทั้งพื้นที่)</div>
+                            <div class="inc-points" id="incident-points-home-p2">
+                                <label><input type="checkbox" value="1"> จุด 1</label>
+                                <label><input type="checkbox" value="2"> จุด 2</label>
+                                <label><input type="checkbox" value="3"> จุด 3</label>
+                            </div>
                             <button style="background-color: #f57c00;" onclick="window.addIncident('home', 'p2')">บันทึกเหตุการณ์</button>
+                        </div>
+                        <div class="inc-filter">แสดง:
+                            <select id="incident-filter-home-p2" onchange="window.renderIncidentsFor('home')">
+                                <option value="all">ทุกจุด</option><option value="1">จุด 1</option><option value="2">จุด 2</option><option value="3">จุด 3</option>
+                            </select>
                         </div>
                         <ul id="list-incident-home-p2" class="todo-list"></ul>
                     </div>
@@ -472,9 +525,23 @@
                             <button class="toggle-btn" style="background: #ffe0b2; color: #e65100;" onclick="window.toggleForm('form-incident-garden-p2')">+</button>
                         </div>
                         <div id="form-incident-garden-p2" class="add-form" style="background: white; border: 1px solid #ffcc80;">
-                            <input type="text" id="incident-text-garden-p2" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, แมลงระบาด)">
+                            <input type="text" id="incident-text-garden-p2" placeholder="ระบุเหตุการณ์ (เช่น พายุเข้า, ไฟดับ, ท่อรั่ว, แมลงระบาด)">
+                            <div class="inc-label">เริ่ม</div>
                             <input type="datetime-local" id="incident-date-garden-p2">
+                            <div class="inc-label">สิ้นสุด (เว้นว่างได้ ถ้าเกิดครั้งเดียว)</div>
+                            <input type="datetime-local" id="incident-end-garden-p2">
+                            <div class="inc-label">จุดที่เกิด (ไม่เลือก = ทั้งพื้นที่)</div>
+                            <div class="inc-points" id="incident-points-garden-p2">
+                                <label><input type="checkbox" value="1"> จุด 1</label>
+                                <label><input type="checkbox" value="2"> จุด 2</label>
+                                <label><input type="checkbox" value="3"> จุด 3</label>
+                            </div>
                             <button style="background-color: #f57c00;" onclick="window.addIncident('garden', 'p2')">บันทึกเหตุการณ์</button>
+                        </div>
+                        <div class="inc-filter">แสดง:
+                            <select id="incident-filter-garden-p2" onchange="window.renderIncidentsFor('garden')">
+                                <option value="all">ทุกจุด</option><option value="1">จุด 1</option><option value="2">จุด 2</option><option value="3">จุด 3</option>
+                            </select>
                         </div>
                         <ul id="list-incident-garden-p2" class="todo-list"></ul>
                     </div>
@@ -965,16 +1032,38 @@
         };
 
         // ================= Incident System =================
-        function renderIncidents(loc) {
-            const incidents = getStorage(`incidents_${loc}`, true);
-            const listP1 = document.getElementById(`list-incident-${loc}`);
-            const listP2 = document.getElementById(`list-incident-${loc}-p2`);
+        // เหตุการณ์: { text, date (เริ่ม), end (สิ้นสุด, ไม่บังคับ), points: ['1','3'] (ว่าง = ทั้งพื้นที่) }
+        const fmtDT = (v, withDate = true) => {
+            const d = new Date(v); if (isNaN(d)) return '';
+            const t = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+            return withDate ? `${d.toLocaleDateString('th-TH')} ${t}` : t;
+        };
+        function incidentTimeText(inc) {
+            if (!inc.date) return '';
+            if (!inc.end) return `🕒 ${fmtDT(inc.date)}`;
+            const s = new Date(inc.date), e = new Date(inc.end);
+            const sameDay = s.toDateString() === e.toDateString();
+            const mins = Math.round((e - s) / 60000);
+            const dur = mins >= 1440 ? `${Math.floor(mins / 1440)} วัน${mins % 1440 >= 60 ? ` ${Math.floor((mins % 1440) / 60)} ชม.` : ''}` : mins >= 60 ? `${Math.floor(mins / 60)} ชม.${mins % 60 ? ` ${mins % 60} นาที` : ''}` : `${mins} นาที`;
+            return `🕒 ${fmtDT(inc.date)} – ${fmtDT(inc.end, !sameDay)} (${dur})`;
+        }
+        const incidentPoints = (inc) => asArray(inc.points).map(String);
 
-            const buildList = (container) => {
-                if(!container) return;
+        function renderIncidents(loc) {
+            const incidents = asArray(getStorage(`incidents_${loc}`, true));
+            // เรียงใหม่สุดก่อน แต่จำตำแหน่งเดิมไว้สำหรับลบ
+            const ordered = incidents.map((inc, idx) => ({ inc, idx })).sort((a, b) => String(b.inc.date || '').localeCompare(String(a.inc.date || '')));
+
+            [['', `list-incident-${loc}`, `incident-filter-${loc}`], ['-p2', `list-incident-${loc}-p2`, `incident-filter-${loc}-p2`]].forEach(([suf, listId, filterId]) => {
+                const container = document.getElementById(listId);
+                if (!container) return;
+                const filter = document.getElementById(filterId)?.value || 'all';
                 container.innerHTML = '';
-                incidents.forEach((inc, idx) => {
+                const shown = ordered.filter(({ inc }) => filter === 'all' || incidentPoints(inc).length === 0 || incidentPoints(inc).includes(filter));
+                if (!shown.length) { container.innerHTML = '<li style="color:#999; border:none;">ไม่มีเหตุการณ์</li>'; return; }
+                shown.forEach(({ inc, idx }) => {
                     const li = document.createElement('li');
+                    li.className = 'inc-item';
                     li.style.borderBottomColor = '#ffe0b2';
 
                     const sp = document.createElement('span');
@@ -982,15 +1071,12 @@
                     sp.innerText = inc.text;
                     li.appendChild(sp);
 
-                    if(inc.date) {
-                        const dateObj = new Date(inc.date);
-                        const dateSpan = document.createElement('span');
-                        dateSpan.className = 'due-date';
-                        dateSpan.style.backgroundColor = '#ffe0b2';
-                        dateSpan.style.color = '#e65100';
-                        dateSpan.innerHTML = `🕒 ${dateObj.toLocaleDateString('th-TH')} ${String(dateObj.getHours()).padStart(2,'0')}:${String(dateObj.getMinutes()).padStart(2,'0')}`;
-                        li.appendChild(dateSpan);
-                    }
+                    const meta = document.createElement('div');
+                    const pts = incidentPoints(inc);
+                    const time = incidentTimeText(inc);
+                    meta.innerHTML = (time ? `<span class="inc-chip">${esc(time)}</span>` : '') +
+                        `<span class="inc-chip">📍 ${pts.length ? pts.map(p => `จุด ${esc(p)}`).join(', ') : 'ทั้งพื้นที่'}</span>`;
+                    li.appendChild(meta);
 
                     const del = document.createElement('button');
                     del.className = 'delete-btn';
@@ -1000,38 +1086,53 @@
                     del.style.cursor = 'pointer';
                     del.style.color = '#e65100';
                     del.style.fontWeight = 'bold';
-                    del.style.marginLeft = '10px';
                     del.onclick = () => {
                         if (!confirm(`ลบเหตุการณ์ "${inc.text}" ใช่หรือไม่?`)) return;
                         incidents.splice(idx, 1);
                         saveStorage(`incidents_${loc}`, incidents);
-                        renderIncidents(loc);
+                        window.refreshAllUI();
                     };
                     li.appendChild(del);
                     container.appendChild(li);
                 });
-            };
-
-            buildList(listP1);
-            buildList(listP2);
+            });
         }
+        window.renderIncidentsFor = (loc) => renderIncidents(loc);
 
         window.addIncident = (loc, pageSuffix = '') => {
             const suffix = pageSuffix ? `-${pageSuffix}` : '';
             const txtEl = document.getElementById(`incident-text-${loc}${suffix}`);
             const dtEl = document.getElementById(`incident-date-${loc}${suffix}`);
+            const endEl = document.getElementById(`incident-end-${loc}${suffix}`);
+            const ptsBox = document.getElementById(`incident-points-${loc}${suffix}`);
 
-            if(!txtEl || !txtEl.value.trim()) return;
+            if(!txtEl || !txtEl.value.trim()) { alert('กรุณาระบุเหตุการณ์'); return; }
+            if (endEl.value && !dtEl.value) { alert('กรุณาใส่เวลาเริ่มด้วย'); return; }
+            if (endEl.value && dtEl.value && endEl.value < dtEl.value) { alert('เวลาสิ้นสุดต้องอยู่หลังเวลาเริ่ม'); return; }
 
-            const incidents = getStorage(`incidents_${loc}`, true);
-            incidents.push({text: txtEl.value, date: dtEl.value});
+            const points = Array.from(ptsBox.querySelectorAll('input:checked')).map(c => c.value);
+            const incidents = asArray(getStorage(`incidents_${loc}`, true));
+            const item = { text: txtEl.value.trim(), date: dtEl.value };
+            if (endEl.value) item.end = endEl.value;
+            if (points.length) item.points = points;
+            incidents.push(item);
             saveStorage(`incidents_${loc}`, incidents);
 
-            txtEl.value = '';
-            dtEl.value = '';
+            txtEl.value = ''; dtEl.value = ''; endEl.value = '';
+            ptsBox.querySelectorAll('input').forEach(c => c.checked = false);
 
-            renderIncidents(loc);
+            window.refreshAllUI();
         };
+
+        // เหตุการณ์ที่ต้องแสดงบนกราฟเซ็นเซอร์ (zone = จุดน้ำ, null = ทุกเหตุการณ์ของพื้นที่)
+        function incidentBands(loc, zone) {
+            return asArray(getStorage(`incidents_${loc}`, true)).filter(inc => {
+                if (!inc.date) return false;
+                if (zone === null) return true;
+                const pts = incidentPoints(inc);
+                return pts.length === 0 || pts.includes(String(zone));
+            }).map(inc => ({ start: new Date(inc.date).getTime(), end: inc.end ? new Date(inc.end).getTime() : null, text: inc.text }));
+        }
 
         window.downloadICS = (loc) => {
             const todos = getStorage(`todos_${loc}`, true);
@@ -1250,6 +1351,32 @@
 
         function hexToRgba(hex, alpha) { let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16); return `rgba(${r}, ${g}, ${b}, ${alpha})`; }
         Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"; Chart.defaults.color = '#777';
+        // ระบายสีช่วงเวลาที่มีเหตุการณ์ผิดปกติบนกราฟเซ็นเซอร์ (สีส้ม)
+        Chart.register({ id: 'incidentBands', beforeDatasetsDraw(chart) {
+            const times = chart.$times, bands = chart.$bands;
+            if (!times || !times.length || !bands || !bands.length) return;
+            const { ctx, chartArea: a, scales: { x } } = chart; if (!a || !x) return;
+            const firstIdx = (t) => { let i = times.findIndex(v => v >= t); return i; };
+            const lastIdx = (t) => { for (let i = times.length - 1; i >= 0; i--) if (times[i] <= t) return i; return -1; };
+            ctx.save();
+            bands.forEach(b => {
+                const endT = b.end ?? b.start;
+                if (endT < times[0] || b.start > times[times.length - 1]) return;
+                let i0 = firstIdx(b.start), i1 = lastIdx(endT);
+                if (i0 < 0) return; if (i1 < i0) i1 = i0;
+                const x0 = x.getPixelForValue(i0), x1 = x.getPixelForValue(i1);
+                if (b.end) {
+                    ctx.fillStyle = 'rgba(255,152,0,0.16)';
+                    ctx.fillRect(Math.min(x0, x1) - 2, a.top, Math.max(4, Math.abs(x1 - x0) + 4), a.bottom - a.top);
+                }
+                ctx.strokeStyle = 'rgba(230,81,0,0.7)'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
+                ctx.beginPath(); ctx.moveTo(x0, a.top); ctx.lineTo(x0, a.bottom); ctx.stroke(); ctx.setLineDash([]);
+                ctx.fillStyle = '#e65100'; ctx.font = "11px 'Segoe UI', Tahoma, sans-serif"; ctx.textBaseline = 'top';
+                const label = b.text.length > 18 ? b.text.slice(0, 17) + '…' : b.text;
+                ctx.fillText('⚠ ' + label, Math.min(x0 + 3, a.right - 110), a.top + 2);
+            });
+            ctx.restore();
+        } });
         // ถ้ากราฟไม่มีข้อมูล ให้เขียนข้อความบอกแทนกราฟว่างเปล่า
         Chart.register({ id: 'noData', afterDraw(chart) {
             const hasData = chart.data.datasets.some(ds => (ds.data || []).some(v => v !== null && v !== undefined && v !== 0));
@@ -1296,7 +1423,11 @@
                 types.push({id: `water_acc_${viewWaterZone}`, key: 'wa', label: `ปริมาณน้ำ จุดที่ ${viewWaterZone} (L)`, color: '#9966ff'});
                 types.forEach(type => {
                     const savedData = getStorage(`sensor_${type.id}_${loc}`, false);
-                    let records = filterByMonth(savedData?.records, currentMonth);
+                    let records = filterByMonth(savedData?.records, currentMonth).sort((a, b) => a.t - b.t);
+                    const chart = myCharts[`${type.key}-${loc}`];
+                    chart.$times = records.map(r => r.t);
+                    // กราฟน้ำ: แสดงเฉพาะเหตุการณ์ของจุดนั้น + ทั้งพื้นที่ / กราฟอื่น: ทุกเหตุการณ์ของพื้นที่
+                    chart.$bands = incidentBands(loc, type.key === 'wa' ? viewWaterZone : null);
                     if (records && records.length > 0) updateChart(myCharts[`${type.key}-${loc}`], type.label, formatChartLabels(records), records.map(r => r.v), type.color);
                     else updateChart(myCharts[`${type.key}-${loc}`], type.label, [], [], type.color);
                 });
