@@ -147,6 +147,16 @@
         .tree-card.vanilla { border-left-color: #b08a4a !important; }
         .stat-breakdown { font-size: 0.9em; color: #555; margin: 6px 0 0 0; }
 
+        /* แท็บการ์ด: ต้นไม้ทั่วไป / วานิลลา / การบำรุง */
+        .tree-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 4px 0 16px; }
+        .tree-tabs::-webkit-scrollbar { display: none; }
+        .tree-tabs button { border: 1px solid #d6dbd6; background: white; color: #444; padding: 9px 6px; border-radius: 12px; font-size: 1em; font-weight: 600; cursor: pointer; font-family: inherit; line-height: 1.3; }
+        .tree-tabs button small { display: block; font-weight: normal; color: #888; font-size: 0.8em; }
+        .tree-tabs button.on[data-tab="other"] { background: #28a745; border-color: #28a745; color: white; }
+        .tree-tabs button.on[data-tab="vanilla"] { background: #8a6a35; border-color: #8a6a35; color: white; }
+        .tree-tabs button.on[data-tab="care"] { background: #b8860b; border-color: #b8860b; color: white; }
+        .tree-tabs button.on small { color: rgba(255,255,255,0.85); }
+
         /* การ์ดเปรียบเทียบ */
         .compare-table { width: 100%; border-collapse: collapse; font-size: 0.92em; }
         .compare-table th, .compare-table td { padding: 8px 6px; border-bottom: 1px solid #eee; text-align: right; white-space: nowrap; }
@@ -1228,8 +1238,8 @@
             const c = countTrees(loc);
             const summary = document.getElementById(`tree-summary-${loc}`);
             if (summary) summary.innerHTML =
+                `<div class="other"><span>🌳 ต้นไม้ทั่วไป</span><b>${c.other.toLocaleString()}</b><span>ต้น</span></div>` +
                 `<div class="vanilla"><span>🌿 วานิลลา</span><b>${c.vanilla.toLocaleString()}</b><span>ต้น</span></div>` +
-                `<div class="other"><span>🌳 ต้นไม้อื่นๆ</span><b>${c.other.toLocaleString()}</b><span>ต้น</span></div>` +
                 `<div class="total"><span>รวมทั้งหมด</span><b>${c.total.toLocaleString()}</b><span>ต้น${c.needCare ? ` · 🔴 ต้องดูแล ${c.needCare}` : ''}</span></div>`;
             renderTreeCards(loc);
         };
@@ -1241,23 +1251,22 @@
 
             grid.innerHTML = '';
             grid.style.display = 'block';
+            // แท็บ 3 แบบ: ต้นไม้ทั่วไป / วานิลลา / การบำรุงต้นไม้ (บันทึกที่ไม่มีชื่อต้นไม้)
+            const TABS = [['other', '🌳 ต้นไม้ทั่วไป'], ['vanilla', '🌿 วานิลลา'], ['care', '🌾 การบำรุงต้นไม้']];
+            if (!treeTab[loc]) { try { treeTab[loc] = localStorage.getItem(`smartFarm_treeTab_${loc}`) || 'other'; } catch (e) { treeTab[loc] = 'other'; } }
+            const tabBar = document.createElement('div');
+            tabBar.className = 'tree-tabs';
+            const sectionBox = document.createElement('div');
+            sectionBox.className = 'tree-grid';
+            grid.appendChild(tabBar); grid.appendChild(sectionBox);
+            const sections = { other: [], vanilla: [], care: [] };
             const c = countTrees(loc);
-            const sections = {};
-            [['vanilla', '🌿 วานิลลา'], ['other', '🌳 ต้นไม้อื่นๆ']].forEach(([type, title]) => {
-                const h = document.createElement('div');
-                h.className = 'tree-section-title';
-                h.innerHTML = `${title} <small>${c[type].toLocaleString()} ต้น · ${c.names[type]} ชื่อ</small>`;
-                const g = document.createElement('div');
-                g.className = 'tree-grid';
-                grid.appendChild(h); grid.appendChild(g);
-                sections[type] = g;
-            });
 
             const searchQuery = (document.getElementById(`search-tree-${loc}`)?.value || '').toLowerCase();
 
-            trees.forEach((tree, originalIdx) => {
-                if (!tree) return;
-
+            const ordered = trees.map((tree, originalIdx) => ({ tree, originalIdx })).filter(x => x.tree)
+                .sort((x, y) => String(y.tree.name ? (y.tree.date || y.tree.fertDate || '') : (y.tree.fertDate || y.tree.date || '')).localeCompare(String(x.tree.name ? (x.tree.date || x.tree.fertDate || '') : (x.tree.fertDate || x.tree.date || ''))));
+            ordered.forEach(({ tree, originalIdx }) => {
                 const formattedDate = tree.date ? new Date(tree.date).toLocaleDateString('th-TH') : '';
                 const formattedFertDate = tree.fertDate ? new Date(tree.fertDate).toLocaleDateString('th-TH') : '';
 
@@ -1295,7 +1304,7 @@
                 let cardContent = `<button class="delete-tree-btn" onclick="window.deleteIndividualTree('${loc}', ${originalIdx})" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.2em; color: red; cursor: pointer;">🗑️</button>`;
 
                 if (isFertOnly) {
-                    cardContent += `<h4 style="color: #856404;">🌾 บันทึกการบำรุง (ทั่วไป)</h4>`;
+                    cardContent += `<h4 style="color: #856404;">🌾 บันทึกการบำรุง<span class="type-badge ${type}">${type === 'vanilla' ? 'วานิลลา' : 'ต้นไม้ทั่วไป'}</span></h4>`;
                     if(tree.note) cardContent += `<p>📝 <strong>หมายเหตุ:</strong> ${esc(tree.note)}</p>`;
                     cardContent += extraInfo;
                 } else {
@@ -1308,12 +1317,23 @@
                 }
 
                 card.innerHTML = cardContent;
-                sections[type].appendChild(card);
+                sections[isFertOnly ? 'care' : type].push(card);
             });
-            Object.entries(sections).forEach(([type, g]) => {
-                if (!g.children.length) g.innerHTML = `<p style="color:#999; margin:0;">${searchQuery ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีรายการ'}</p>`;
+
+            const unit = { other: `${c.other.toLocaleString()} ต้น`, vanilla: `${c.vanilla.toLocaleString()} ต้น`, care: `${sections.care.length} ครั้ง` };
+            TABS.forEach(([key, title]) => {
+                const btn = document.createElement('button');
+                btn.dataset.tab = key;
+                btn.className = key === treeTab[loc] ? 'on' : '';
+                btn.innerHTML = `${title}<small>${searchQuery ? `พบ ${sections[key].length}` : unit[key]}</small>`;
+                btn.onclick = () => { treeTab[loc] = key; try { localStorage.setItem(`smartFarm_treeTab_${loc}`, key); } catch (e) {} renderTreeCards(loc); };
+                tabBar.appendChild(btn);
             });
+            const cards = sections[treeTab[loc]] || [];
+            if (cards.length) cards.forEach(cd => sectionBox.appendChild(cd));
+            else sectionBox.innerHTML = `<p style="color:#999; margin:0;">${searchQuery ? 'ไม่พบรายการที่ค้นหา' : 'ยังไม่มีรายการ'}</p>`;
         }
+        const treeTab = {};
 
         window.addIndividualTree = (loc) => {
             try {
@@ -1491,7 +1511,7 @@
                 const c = countTrees(loc);
                 document.getElementById(`tree-${loc}`).innerText = c.total.toLocaleString();
                 document.getElementById(`tree-note-${loc}`).innerHTML = c.total
-                    ? `<span class="stat-breakdown">🌿 วานิลลา <b>${c.vanilla.toLocaleString()}</b> · 🌳 อื่นๆ <b>${c.other.toLocaleString()}</b></span>${c.needCare ? `<br>🔴 ต้องดูแลพิเศษ ${c.needCare} ต้น` : ''}`
+                    ? `<span class="stat-breakdown">🌳 ทั่วไป <b>${c.other.toLocaleString()}</b> · 🌿 วานิลลา <b>${c.vanilla.toLocaleString()}</b></span>${c.needCare ? `<br>🔴 ต้องดูแลพิเศษ ${c.needCare} ต้น` : ''}`
                     : 'ยังไม่มีชื่อต้นไม้ เพิ่มได้ที่หน้า "ข้อมูลต้นไม้"';
             });
 
